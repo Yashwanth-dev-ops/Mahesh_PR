@@ -16,6 +16,18 @@ function loadPdfjs() {
   return pdfjsReady;
 }
 
+/** For pages that list PDFs: gets pdf.js and its worker (~500 KB, cached after the first time) ready while the
+ *  student is still reading the list, so tapping "Read" doesn't wait for them. Skipped when the phone asks to save data. */
+export function useWarmPdfReader() {
+  useEffect(() => {
+    if ((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) return;
+    const warm = () => { loadPdfjs().catch(() => {}); };
+    if ("requestIdleCallback" in window) { const id = requestIdleCallback(warm, { timeout: 3000 }); return () => cancelIdleCallback(id); }
+    const t = setTimeout(warm, 1500); // Safari has no requestIdleCallback
+    return () => clearTimeout(t);
+  }, []);
+}
+
 /** Renders one PDF page at a time to fit the screen; remembers the page for "Resume at page N". */
 export function PdfReader({ url, materialId, chapterId, startPage = 1 }: { url: string; materialId?: string; chapterId?: string; startPage?: number }) {
   const canvas = useRef<HTMLCanvasElement>(null);

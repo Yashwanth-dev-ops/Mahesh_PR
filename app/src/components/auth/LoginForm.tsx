@@ -41,10 +41,11 @@ export function LoginForm({ admin = false }: { admin?: boolean } = {}) {
     const t0 = Date.now(), still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const res = await signIn(data).catch(() => ({ message: "Something went wrong. Try again." }) as LoginResult);
     if (res.ok) {
+      const to = res.to ?? "/home";
+      router.prefetch(to); // its code downloads while the flood plays
       await wait(Math.max(0, t0 + (still ? 0 : 800) - Date.now())); // let the flood finish first
       revealOk("Welcome back", res.name ?? "", res.roll ?? "");
-      await wait(still ? 300 : 1000); // check + greeting
-      router.push(res.to ?? "/home");
+      router.push(to); // loads under the greeting; RevealHost keeps the greeting up for its full time
       return;
     }
     revealFail();

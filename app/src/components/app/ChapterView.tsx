@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { materialLink, setChapterDone, setKnown, touchChapter } from "@/app/actions/learn";
 import { Icon, Svg } from "./bits";
+import { useWarmPdfReader } from "./PdfReader";
 
 type Section = { id: string; heading: string; body: string };
 type Material = { id: string; title: string; type: string; size_bytes: number | null; page_count: number | null; url: string | null };
@@ -33,6 +34,7 @@ export function ChapterView(p: {
   );
 
   useEffect(() => { touchChapter(p.chapterId).catch(() => {}); }, [p.chapterId]); // feeds "Continue learning"
+  useWarmPdfReader();
 
   const toggleDone = async () => {
     const next = !done;

@@ -25,6 +25,7 @@ export function RevealHost() {
   const [st, setSt] = useState<State>(null);
   const path = usePathname();
   const startPath = useRef(path);
+  const greetUntil = useRef(0); // the greeting stays up at least this long, however fast the next page arrives
 
   useEffect(() => {
     const on = (e: Event) => {
@@ -33,8 +34,10 @@ export function RevealHost() {
         startPath.current = location.pathname;
         const far = Math.hypot(Math.max(m.x, innerWidth - m.x), Math.max(m.y, innerHeight - m.y));
         setSt({ phase: "loading", x: m.x, y: m.y, s: Math.ceil((far * 2) / 40) + 1, title: "", name: "", roll: "" });
-      } else if (m.type === "ok") setSt((s) => s && { ...s, phase: "ok", title: m.title, name: m.name, roll: m.roll });
-      else setSt((s) => s && { ...s, phase: "closing" });
+      } else if (m.type === "ok") {
+        greetUntil.current = performance.now() + (matchMedia("(prefers-reduced-motion: reduce)").matches ? 300 : 1000);
+        setSt((s) => s && { ...s, phase: "ok", title: m.title, name: m.name, roll: m.roll });
+      } else setSt((s) => s && { ...s, phase: "closing" });
     };
     window.addEventListener(EVENT, on);
     return () => window.removeEventListener(EVENT, on);
@@ -43,7 +46,8 @@ export function RevealHost() {
   // The next page is on screen: open the yellow onto it.
   useEffect(() => {
     if (st?.phase === "ok" && path !== startPath.current) {
-      const t = setTimeout(() => setSt((s) => s && { ...s, phase: "leaving" }), 250); // let the page paint first
+      // Let the page paint first, and let the greeting finish.
+      const t = setTimeout(() => setSt((s) => s && { ...s, phase: "leaving" }), Math.max(250, greetUntil.current - performance.now()));
       return () => clearTimeout(t);
     }
   }, [path, st?.phase]);

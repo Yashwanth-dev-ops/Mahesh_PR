@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { paperLink } from "@/app/actions/learn";
 import { Icon, Svg } from "./bits";
+import { useWarmPdfReader } from "./PdfReader";
 
 export function PaperRow({ p }: { p: { id: string; subject: string; title: string; meta: string } }) {
   const [msg, setMsg] = useState("");
+  useWarmPdfReader();
   const download = async () => {
     const { url } = await paperLink(p.id).catch(() => ({ url: null }));
     if (url) window.location.assign(url); else setMsg("Not available right now.");

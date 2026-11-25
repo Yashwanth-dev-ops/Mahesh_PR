@@ -60,10 +60,10 @@ export function SignupForm({ googleName }: { googleName?: string } = {}) {
     if (res.ok && res.status === "active") {
       // Account works right away: the loader greets them and opens onto the library.
       const s2 = readSignup(data);
+      router.prefetch("/home"); // its code downloads while the flood plays
       await wait(t0 + (still ? 0 : 800) - Date.now());
       revealOk("Welcome", s2.fullName.split(" ")[0], s2.roll);
-      await wait(still ? 300 : 1000);
-      router.push("/home");
+      router.push("/home"); // loads under the greeting; RevealHost keeps the greeting up for its full time
       return;
     }
     revealFail();
