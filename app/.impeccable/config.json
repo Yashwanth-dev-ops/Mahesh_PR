@@ -1,0 +1,35 @@
+{
+  "hook": {
+    "enabled": true,
+    "limits": {
+      "maxFindings": 5,
+      "maxChars": 8000
+    }
+  },
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "files": [
+          "src/lib/email.ts",
+          "supabase/templates/recovery.html"
+        ],
+        "createdAt": "2026-11-25T07:04:50.843Z",
+        "reason": "Agent: HTML email; mail clients don't load web fonts, Arial is the email-safe stack"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "src/lib/email.ts",
+          "supabase/templates/recovery.html"
+        ],
+        "createdAt": "2026-11-25T07:04:50.879Z",
+        "reason": "Agent: #f5f3ef is the project's existing --bg token (globals.css), reused so emails match the app"
+      }
+    ]
+  }
+}

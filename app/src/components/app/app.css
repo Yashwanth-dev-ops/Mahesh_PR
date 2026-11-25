@@ -1,0 +1,224 @@
+/* Student app (light theme, DESIGN_SYSTEM tokens from globals.css): warm white page, black cards, yellow accent.
+   Phones: bottom tab bar. ≥900px: side bar. Prefix: ap-. */
+
+.ap-shell { min-height: 100svh; background: var(--bg); color: var(--ink); }
+.ap-skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; }
+.ap-skip:focus-visible { top: 12px; }
+.ap-main { width: 100%; max-width: 880px; margin: 0 auto; padding: 16px 24px calc(96px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 24px; }
+.ap-solo { min-height: 100svh; padding-bottom: 48px; }
+.ap-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.ap-main ::selection { background: var(--accent); color: var(--ink); }
+
+/* ---------- navigation ---------- */
+.ap-nav {
+  position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; display: flex; align-items: center;
+  background: var(--card); border-top: 1px solid var(--border); padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+}
+.ap-nav ul { display: flex; flex: 1; justify-content: space-around; list-style: none; margin: 0; padding: 0; }
+.ap-nav .ap-brandSide, .ap-outForm, .ap-sideOnly { display: none; }
+.ap-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 12px 0 24px; background: var(--bg); border-bottom: 1px solid var(--border); }
+.ap-brand { display: flex; align-items: center; min-height: 44px; gap: 10px; font-weight: 600; font-size: 16px; }
+.ap-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--ink); color: var(--bg); display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+.ap-iconLink { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; }
+@media (hover: hover) { .ap-iconLink:hover { background: var(--surface); } }
+.ap-link {
+  display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 60px; min-height: 48px; justify-content: center;
+  padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; color: var(--ink-muted);
+  background: none; border: 0; font-family: inherit; cursor: pointer;
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.ap-link[aria-current="page"] { background: var(--primary-soft); color: var(--ink); }
+.ap-link:active { background: var(--surface); }
+@media (hover: hover) { .ap-link:hover { color: var(--ink); } }
+
+@media (min-width: 900px) {
+  .ap-shell { display: grid; grid-template-columns: 232px minmax(0, 1fr); }
+  .ap-nav {
+    position: sticky; top: 0; height: 100svh; flex-direction: column; align-items: stretch; gap: 8px;
+    border-top: 0; border-right: 1px solid var(--border); padding: 24px 16px;
+  }
+  .ap-nav ul { flex: 0; flex-direction: column; gap: 4px; }
+  .ap-top { display: none; }
+  .ap-nav .ap-brandSide { display: flex; padding: 4px 8px 20px; }
+  .ap-sideOnly { display: block; }
+  .ap-outForm { display: block; margin-top: auto; }
+  .ap-link { flex-direction: row; justify-content: flex-start; gap: 12px; width: 100%; font-size: 15px; padding: 10px 12px; }
+  .ap-main { padding: 40px 40px 64px; }
+}
+
+/* ---------- type ---------- */
+.ap-h1 { margin: 0; font-size: clamp(26px, 5vw, 34px); font-weight: 800; letter-spacing: -0.015em; line-height: 1.15; text-wrap: balance; }
+.ap-h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.ap-h3 { margin: 0 0 6px; font-size: 17px; font-weight: 700; }
+.ap-meta { margin: 0; font-size: 14px; color: var(--ink-muted); line-height: 1.45; }
+.ap-kicker { margin: 0; font-family: var(--font-jetbrains), monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+.ap-code { font-family: var(--font-jetbrains), monospace; font-size: 12px; color: var(--ink-muted); letter-spacing: 0.04em; }
+.ap-empty { margin: 0; padding: 20px; border: 1.5px dashed var(--border); border-radius: 14px; color: var(--ink-muted); line-height: 1.5; }
+.ap-crumb { margin: 0; font-size: 14px; }
+.ap-crumb a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--ink-muted); }
+.ap-crumb a:hover { color: var(--ink); }
+.ap-more { margin: 4px 0 0; font-size: 15px; }
+.ap-more a { text-decoration: underline; text-underline-offset: 3px; padding: 14px 0; } /* 44px tap area, same look */
+
+/* ---------- buttons ---------- */
+.ap-btnY, .ap-btnLine, .ap-btnInk {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px;
+  border-radius: 999px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  transition: scale 120ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+.ap-btnY { background: var(--accent); color: var(--ink); border: 0; }
+.ap-btnInk { background: var(--ink); color: var(--bg); border: 0; }
+.ap-wide { width: 100%; }
+.ap-btnLine { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.ap-btnY:active, .ap-btnLine:active, .ap-btnInk:active { scale: 0.97; }
+@media (hover: hover) { .ap-btnLine:hover { background: var(--surface); } .ap-btnY:hover { background: #ffd43a; } }
+.ap-iconBtn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink); cursor: pointer; }
+.ap-iconBtn:disabled { opacity: 0.4; cursor: default; }
+
+/* ---------- cards ---------- */
+.ap-card { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; color: inherit; }
+a.ap-card { transition: translate 160ms var(--ease-out), border-color 160ms var(--ease-out), scale 120ms var(--ease-out); }
+a.ap-card:active { scale: 0.98; } /* touch has no hover: show the press while the next page loads */
+@media (hover: hover) { a.ap-card:hover { translate: 0 -2px; border-color: var(--ink); } }
+
+/* home */
+.ap-hello { display: flex; align-items: center; gap: 16px; }
+.ap-avatar { width: 60px; height: 60px; flex: none; border-radius: 16px; object-fit: cover; border: 1.5px solid var(--ink); background: var(--accent); display: grid; place-items: center; font-weight: 800; font-size: 24px; }
+.ap-continue { background: var(--ink); color: var(--bg); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.ap-continue .ap-kicker { color: var(--accent); }
+.ap-contTitle { margin: 0; font-size: 18px; font-weight: 600; line-height: 1.35; }
+.ap-bar { width: 100%; height: 6px; border-radius: 9px; background: rgba(255, 255, 255, 0.18); overflow: hidden; }
+.ap-bar i { display: block; height: 100%; background: var(--accent); border-radius: 9px; }
+.ap-secHead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.ap-group { display: flex; flex-direction: column; gap: 12px; }
+
+/* subject grid */
+.ap-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.ap-subject { height: 100%; flex-direction: column; align-items: stretch; gap: 6px; padding: 20px; }
+.ap-subjectTop { display: flex; justify-content: space-between; align-items: center; color: var(--ink-muted); }
+.ap-barLight { background: var(--surface); margin-top: 8px; }
+.ap-caption { font-size: 12px; color: var(--ink-muted); }
+.ap-sicon { width: 48px; height: 48px; flex: none; border-radius: 12px; background: var(--primary-soft); color: var(--ink); display: grid; place-items: center; }
+.ap-subjectText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ap-subjectName { font-weight: 600; font-size: 18px; line-height: 1.3; }
+.ap-ringWrap { flex: none; }
+.ap-ring { display: block; color: var(--ink); }
+
+/* subject page */
+.ap-subjectHead { display: flex; align-items: center; gap: 16px; }
+.ap-subjectHead > div { flex: 1; min-width: 0; }
+.ap-subjectHead .ap-sicon { width: 60px; height: 60px; border-radius: 16px; }
+.ap-chapters, .ap-files, .ap-questions, .ap-results, .ap-notes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.ap-chNum { width: 36px; height: 36px; flex: none; border-radius: 10px; background: var(--surface); display: grid; place-items: center; font-family: var(--font-jetbrains), monospace; font-weight: 500; }
+.ap-chText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ap-chTitle { font-weight: 600; line-height: 1.35; }
+.ap-done { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--success); }
+
+/* chapter page */
+.ap-chapterPage { display: flex; flex-direction: column; gap: 24px; }
+.ap-chHead { display: flex; flex-direction: column; gap: 6px; }
+.ap-chHead .ap-kicker { color: var(--ink-muted); }
+.ap-searchBox { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px; border: 1.5px solid var(--border); border-radius: 999px; background: var(--card); color: var(--ink-muted); margin-bottom: 16px; }
+.ap-searchBox:focus-within { border-color: var(--ink); }
+.ap-searchBox input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; font-size: 16px; color: var(--ink); }
+.ap-searchBig { padding-right: 4px; }
+.ap-section { padding: 16px 0; border-top: 1px solid var(--border); }
+.ap-section:first-of-type { border-top: 0; padding-top: 4px; }
+.ap-section p { margin: 0 0 10px; font-size: 17px; line-height: 1.7; max-width: 68ch; }
+.ap-section mark, .ap-snippet mark { background: var(--primary-soft); color: inherit; border-radius: 3px; padding: 0 2px; }
+.ap-block { display: flex; flex-direction: column; gap: 12px; }
+.ap-file .ap-btnLine { padding: 0 16px; }
+
+.ap-questions li { display: flex; flex-direction: column; gap: 6px; }
+.ap-q { flex-direction: column; align-items: stretch; gap: 0; padding: 0; }
+.ap-q summary { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; list-style: none; font-weight: 600; line-height: 1.4; }
+.ap-q summary::-webkit-details-marker { display: none; }
+.ap-q summary::after { content: "+"; margin-left: auto; font-size: 20px; color: var(--ink-muted); }
+.ap-q[open] summary::after { content: "–"; }
+.ap-qNum { width: 28px; height: 28px; flex: none; border-radius: 999px; background: var(--accent); display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.ap-qText { flex: 1; }
+.ap-answer { margin: 0; padding: 0 16px 16px 56px; line-height: 1.65; color: var(--ink-muted); }
+.ap-know {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px;
+  border: 1.5px solid var(--border); background: var(--card); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--ink-muted);
+}
+.ap-know[aria-pressed="true"] { border-color: var(--success); color: var(--success); background: #eaf6ef; }
+
+.ap-chFoot { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.ap-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ap-pg { flex-direction: column; align-items: flex-start; gap: 2px; font-weight: 600; }
+.ap-pgNext { align-items: flex-end; text-align: right; }
+
+/* reader */
+.ap-reader { display: flex; flex-direction: column; gap: 12px; }
+.ap-page { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; min-height: 240px; display: grid; place-items: center; overflow: hidden; }
+.ap-page canvas { display: block; max-width: 100%; height: auto; }
+.ap-readerBar {
+  position: sticky; bottom: calc(76px + env(safe-area-inset-bottom)); align-self: center; display: flex; align-items: center; gap: 16px;
+  background: var(--ink); color: var(--bg); padding: 6px; border-radius: 999px; box-shadow: 0 10px 30px rgba(8, 9, 11, 0.25);
+}
+.ap-readerBar .ap-meta { color: var(--bg); min-width: 110px; text-align: center; }
+.ap-readerBar .ap-iconBtn { background: transparent; border-color: rgba(255, 255, 255, 0.3); color: var(--bg); }
+@media (min-width: 900px) { .ap-readerBar { bottom: 24px; } }
+
+/* notes */
+.ap-note { flex-direction: column; align-items: stretch; gap: 12px; }
+.ap-noteHead { display: flex; align-items: center; gap: 12px; }
+.ap-note .ap-sicon { width: 40px; height: 40px; border-radius: 10px; }
+.ap-note textarea {
+  width: 100%; min-height: 110px; resize: vertical; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px;
+  background: var(--bg); font: inherit; font-size: 16px; line-height: 1.55; color: var(--ink);
+}
+.ap-note textarea:focus { outline: none; border-color: var(--ink); }
+.ap-note .ap-meta { min-height: 1.4em; }
+
+/* search */
+.ap-result { flex-direction: column; align-items: flex-start; gap: 4px; }
+.ap-snippet { font-size: 14px; color: var(--ink-muted); line-height: 1.5; }
+
+/* motion: tab changes are frequent, so the page only fades in (150ms, no slide, no stagger) */
+@media (prefers-reduced-motion: no-preference) {
+  .ap-main { animation: ap-in 150ms var(--ease-out) both; }
+}
+@keyframes ap-in { from { opacity: 0; } }
+
+/* profile */
+.ap-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; }
+.ap-stat { flex-direction: column; align-items: flex-start; gap: 4px; }
+.ap-stat dd { margin: 0; font-size: 26px; font-weight: 800; }
+
+.ap-onPhone { display: none; }
+
+/* Phones: compact subject cards (about half height) so more subjects fit on one screen. */
+@media (max-width: 640px) {
+  .ap-grid { gap: 8px; }
+  .ap-subject { padding: 12px 16px; gap: 2px; }
+  .ap-subjectTop { font-size: 11px; }
+  .ap-subjectTop svg { width: 18px; height: 18px; }
+  .ap-subjectName { font-size: 16px; }
+  .ap-subject .ap-meta { font-size: 13px; }
+  .ap-subject .ap-bar { height: 4px; margin-top: 6px; }
+  .ap-subject .ap-caption { display: none; }
+  .ap-onPhone { display: inline; } /* the bar + "N of M done" in the meta line carry it */
+}
+
+/* notices (Figma Card/Notice) */
+.ap-notice { flex-direction: column; align-items: flex-start; gap: 6px; }
+.ap-noticeTop { margin: 0; }
+.ap-cat { color: var(--ink); font-weight: 500; }
+.ap-noticeBody { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-muted); white-space: pre-line; }
+.ap-clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ap-topIcons { display: flex; }
+
+/* papers: segmented control + subject chips (Figma 08) */
+.ap-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 4px; background: var(--surface); border-radius: 999px; }
+.ap-seg a { min-height: 44px; display: grid; place-items: center; border-radius: 999px; font-size: 14px; font-weight: 500; color: var(--ink-muted); text-align: center; padding: 0 8px; }
+.ap-seg a[aria-current="page"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(8, 9, 11, 0.12); }
+.ap-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ap-chip { position: relative; min-height: 36px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--card); font-size: 14px; font-weight: 500; }
+.ap-chip::after { content: ""; position: absolute; inset: -4px 0; } /* 44px tap area, same look */
+.ap-chip[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.ap-btnInk:disabled { opacity: 0.6; cursor: progress; }
+
+/* Small text links get a 44px tap area without changing the layout. */
+.ap-tapLink { padding: 12px 0; margin: -12px 0; }

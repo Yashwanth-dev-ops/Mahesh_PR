@@ -1,0 +1,151 @@
+/* Landing page: dark mode of the design system (midnight #08090B, warm white #F5F3EF, yellow #FFC900). */
+.lp-page {
+  --l-bg: #08090b;
+  --l-ink: #f5f3ef;
+  --l-muted: #a8a49c;
+  --l-yellow: #ffc900;
+  --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 20.4%, 1.051 24.5%, 1.055 28.3%, 1.039 33.9%, 1.008 44.5%, 0.996 55.3%, 1);
+  --inout: cubic-bezier(0.7, 0, 0.2, 1);
+  --pop: linear(0, 0.25 6%, 0.6 12%, 1 22%, 1.06 30%, 1.02 40%, 0.995 55%, 1);
+  background: var(--l-bg);
+  color: var(--l-ink);
+  min-height: 100svh; display: grid; grid-template-rows: auto 1fr; /* nav + hero fill the screen exactly */
+  overflow: clip; /* the scaled 640px stage still takes its full size in layout; don't let it add scroll */
+}
+
+.lp-skipLink {
+  position: absolute; left: 16px; top: -60px; z-index: 20;
+  background: var(--l-yellow); color: var(--l-bg); padding: 10px 16px; border-radius: 999px; font-weight: 500;
+}
+.lp-skipLink:focus-visible { top: 16px; }
+
+.lp-wrap { max-width: 1440px; margin: 0 auto; padding-left: 64px; padding-right: 64px; }
+
+/* ---------- nav ---------- */
+.lp-navWrap { display: flex; align-items: center; gap: 36px; padding-top: 24px; padding-bottom: 24px; }
+.lp-menu {
+  width: 44px; height: 44px; display: grid; place-items: center; margin-left: -11px;
+  background: none; border: 0; color: var(--l-ink); cursor: pointer;
+}
+.lp-links { display: flex; gap: 32px; list-style: none; margin: 0; padding: 0; }
+.lp-mono { font-family: var(--font-jetbrains), ui-monospace, monospace; font-weight: 500; text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px; }
+.lp-links a {
+  display: inline-block; padding: 14px 0;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 220ms var(--ease-out);
+}
+.lp-links a:hover { background-size: 100% 1px; }
+.lp-navEnd { margin-left: auto; }
+
+/* ---------- hero ---------- */
+.lp-hero { position: relative; height: 100%; }
+.lp-heroWrap {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: center;
+  padding-top: 8px; padding-bottom: 32px; height: 100%;
+}
+.lp-label { line-height: 1.5; margin: 0 0 16px; }
+.lp-h1 {
+  margin: 0; font-weight: 900; font-size: clamp(48px, min(7vw, 12svh), 100px); /* height cap keeps the button on the first screen */ line-height: 0.95;
+  letter-spacing: -0.015em; /* was -0.06em: opened up so the letters breathe */
+}
+.lp-line { display: block; }
+.lp-word { display: inline-block; white-space: nowrap; }
+.lp-ch { display: inline-block; }
+.lp-ydot {
+  display: inline-block; width: 0.22em; height: 0.22em; border-radius: 50%;
+  background: var(--l-yellow); margin-left: 0.05em;
+}
+.lp-sub { margin: 24px 0 0; max-width: 34em; font-size: 17px; line-height: 1.6; color: var(--l-muted); }
+.lp-ctaRow { margin-top: 24px; }
+
+/* ---------- visual stage: 640 x 640, scaled down on small screens ---------- */
+/* Desktop: the scene follows the screen height so it never runs off the bottom. */
+.lp-visual { position: relative; width: min(520px, calc(100svh - 150px)); min-width: 380px; aspect-ratio: 1; justify-self: center; }
+.lp-stage { contain: layout style; position: absolute; left: 0; top: 0; width: 640px; height: 640px; transform-origin: 0 0; transform: scale(var(--s, 1)); }
+.lp-ring { position: absolute; inset: 0; }
+.lp-disc { position: absolute; left: 60px; top: 60px; width: 520px; height: 520px; border-radius: 50%; background: var(--l-yellow); }
+.lp-phone {
+  position: absolute; left: 175px; top: 0; width: 289px; height: 625px; border-radius: 32px; overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+}
+.lp-orbit { position: absolute; inset: 0; }
+.lp-sticker { position: absolute; left: var(--x); top: var(--y); translate: -50% -50%; } /* centred on the ring */
+.lp-sticker > span {
+  display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; white-space: nowrap;
+  font-size: 13px; letter-spacing: 0.06em;
+  border: 1.5px solid var(--l-ink); transform: rotate(var(--r)); transition: transform 240ms var(--ease-out);
+}
+.lp-stickerY > span { background: var(--l-yellow); color: var(--l-bg); }
+.lp-stickerO > span { background: var(--l-bg); color: var(--l-ink); }
+@media (hover: hover) {
+  .lp-sticker > span:hover { transform: translateY(-2px) rotate(calc(var(--r) * 0.5)); }
+}
+.lp-side { position: absolute; right: 40px; bottom: 32px; margin: 0; line-height: 1.6; font-size: 11px; }
+/* ---------- responsive ---------- */
+/* Phones and tablets: the scene leads at the top so the intro plays in view, then the copy.
+   Tags are counter-scaled so their text stays readable when the stage shrinks. */
+@media (max-width: 1100px) {
+  .lp-wrap { padding-left: 24px; padding-right: 24px; }
+  .lp-heroWrap { grid-template-columns: 1fr; gap: 20px; padding-top: 4px; padding-bottom: 56px; min-height: 0; }
+  .lp-links { display: none; }
+  .lp-navWrap { padding-top: 16px; padding-bottom: 16px; }
+  .lp-visual { order: -1; width: min(100%, 40svh, 480px); min-width: 0; }
+  .lp-sticker > span { scale: max(1, calc(0.6 / var(--s, 1))); }
+}
+/* Phones: the button moves up next to the headline so it sits on the first screen; the longer copy follows. */
+@media (max-width: 640px) {
+  .lp-copy { display: flex; flex-direction: column; }
+  .lp-label { margin-bottom: 16px; }
+  .lp-ctaRow { order: 1; margin-top: 24px; }
+  .lp-sub { order: 2; margin-top: 24px; font-size: 16px; }
+  .lp-side { display: none; }
+}
+
+/* ---------- cinematic intro (first visit per session, motion allowed) ----------
+   1 circle forms   0.00–1.35 s  ring draws, disc grows inside it
+   2 yellow tags    1.35–2.30 s  "6 chapters", "PDF · 3.1 MB"
+   3 phone rises    1.90–2.90 s
+   4 outline tags   2.70–3.60 s
+   5 letters        3.50–4.30 s  headline letter by letter, then copy, button, nav
+   The scene plays where it rests. The PDF tag keeps floating afterwards. */
+@property --sweep { syntax: "<angle>"; inherits: false; initial-value: 360deg; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-intro="pending"] .lp-page [data-in] { opacity: 0; }
+
+  /* The conic mask "draws" the ring; it exists only during the intro, so the orbiting ring never repaints. */
+  html[data-intro="play"] .lp-page .lp-ring {
+    mask-image: conic-gradient(from 0deg, #000 var(--sweep), transparent 0);
+    -webkit-mask-image: conic-gradient(from 0deg, #000 var(--sweep), transparent 0);
+    animation: sweep 1100ms var(--inout) 0ms both;
+  }
+  html[data-intro="play"] .lp-page .lp-disc    { animation: disc 1000ms var(--ease-out) 350ms both; }
+  html[data-intro="play"] .lp-page .lp-stickerY { animation: tag 700ms var(--spring) both; animation-delay: calc(1350ms + var(--i) * 250ms); }
+  html[data-intro="play"] .lp-page .lp-phone   { animation: rise 1000ms var(--spring) 1900ms both; }
+  html[data-intro="play"] .lp-page .lp-stickerO { animation: tag 600ms var(--spring) both; animation-delay: calc(2700ms + (var(--i) - 2) * 150ms); }
+  html[data-intro="play"] .lp-page .lp-label   { animation: soft 600ms var(--ease-out) 1000ms both; }
+  html[data-intro="play"] .lp-page .lp-ch      { animation: letter 560ms var(--ease-out) both; animation-delay: calc(1050ms + var(--i) * 30ms); }
+  html[data-intro="play"] .lp-page .lp-ydot    { animation: pop 520ms var(--pop) 1750ms both; }
+  html[data-intro="play"] .lp-page .lp-sub     { animation: soft 600ms var(--ease-out) 1600ms both; }
+  html[data-intro="play"] .lp-page .lp-ctaRow  { animation: soft 600ms var(--ease-out) 1750ms both; } /* copy first, button right after (by 2.3 s); nav is never hidden */
+  html[data-intro="play"] .lp-page .lp-side    { animation: soft 600ms var(--ease-out) 1900ms both; }
+
+  /* After the intro: the ring and tags orbit once every 48 s. Each tag spins back by the same amount on its own
+     `rotate`, so its text stays upright; the PDF tag also floats on `translate`. None of these fight `transform`. */
+  .lp-page { --orbit-at: 0ms; }
+  html:is([data-intro="play"], [data-intro="done"]) .lp-page { --orbit-at: 3600ms; }
+  /* Runs continuously (owner's choice: stopping read as a freeze). Reduced motion keeps it still. */
+  .lp-orbit { animation: orbit 48s linear infinite var(--orbit-at); }
+  .lp-sticker > span { animation: orbit 48s linear infinite reverse var(--orbit-at); }
+  .lp-float > span { animation: orbit 48s linear infinite reverse var(--orbit-at), float 3.2s ease-in-out infinite alternate; }
+}
+
+@keyframes sweep  { from { --sweep: 0deg; opacity: 0.3; } }
+@keyframes disc   { from { opacity: 0; transform: scale(0.3); } 25% { opacity: 1; } }
+@keyframes tag    { from { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(var(--spin)) scale(0.9); } 30% { opacity: 1; } }
+@keyframes rise   { from { opacity: 0; transform: translateY(120px) scale(0.94); } 30% { opacity: 1; } }
+@keyframes letter { from { opacity: 0; transform: translateY(0.35em); } }
+@keyframes soft   { from { opacity: 0; transform: translateY(10px); } }
+@keyframes pop    { from { opacity: 0; transform: scale(0.4); } }
+@keyframes float  { from { translate: 0 0; } to { translate: 0 -10px; } }
+@keyframes orbit  { to { rotate: 1turn; } }

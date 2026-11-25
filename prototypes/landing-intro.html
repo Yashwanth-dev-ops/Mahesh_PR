@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en" class="intro-pending">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[App Name] · Landing intro</title>
+<meta name="description" content="Chapter notes, past question papers and college notices for AI-ML students, checked by admins.">
+<meta name="theme-color" content="#08090B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Schibsted+Grotesk:wght@400;500;600;900&display=swap" rel="stylesheet">
+<script>
+  // Play the intro once per browser session; returning visitors see the page instantly.
+  (function () {
+    var root = document.documentElement, seen = false;
+    try { seen = sessionStorage.getItem('intro-seen') === '1'; } catch (e) {}
+    if (seen) { root.classList.remove('intro-pending'); return; }
+    var start = function () {
+      root.classList.remove('intro-pending'); root.classList.add('intro-play');
+      try { sessionStorage.setItem('intro-seen', '1'); } catch (e) {}
+      // Review aid: ?freeze=900 pins every intro animation at 900 ms (for screenshots).
+      var f = /[?&]freeze=(\d+)/.exec(location.search);
+      if (f) requestAnimationFrame(function () { document.getAnimations().forEach(function (a) { a.pause(); a.currentTime = +f[1]; }); });
+    };
+    // Wait for fonts so the headline does not reflow mid-animation (max 800 ms).
+    var t = setTimeout(start, 800);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { clearTimeout(t); start(); });
+  })();
+</script>
+<style>
+  :root {
+    --bg: #08090B; --ink: #F5F3EF; --muted: #A8A49C; --yellow: #FFC900;
+    /* app (light) tokens used inside the phone */
+    --a-bg: #F5F3EF; --a-card: #FFFFFF; --a-surface: #EAE7E0; --a-ink: #08090B; --a-muted: #5A5750; --a-border: #DEDAD2; --a-soft: #FFF0B3;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'Schibsted Grotesk', system-ui, sans-serif;
+    /* easing */
+    --out: cubic-bezier(.16, 1, .3, 1);          /* expo-out: arrivals */
+    --sweep-ease: cubic-bezier(.65, 0, .35, 1);  /* ring draw */
+    /* gentle spring (~8% overshoot) for the disc and phone */
+    --spring: linear(0, .009, .035 2.1%, .141 4.4%, .723 12.9%, .938 16.7%, 1.017 20.4%, 1.051 24.5%, 1.055 28.3%, 1.039 33.9%, 1.008 44.5%, .996 55.3%, 1);
+    /* sticker "slap": fast arrival, one small bounce */
+    --slap: linear(0, .25 6%, .6 12%, 1 22%, 1.06 30%, 1.02 40%, .995 55%, 1);
+  }
+  @property --sweep { syntax: '<angle>'; inherits: false; initial-value: 360deg; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--ink); overflow-x: clip; }
+  body { font-family: var(--sans); -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; }
+  a { color: inherit; text-decoration: none; }
+  .skip { position: absolute; left: 16px; top: -60px; background: var(--yellow); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-weight: 500; z-index: 10; }
+  .skip:focus-visible { top: 16px; }
+  :focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; border-radius: 6px; }
+
+  /* ---------- nav ---------- */
+  /* one container for nav and hero: equal left and right edges */
+  .wrap { max-width: 1440px; margin: 0 auto; padding-left: 64px; padding-right: 64px; }
+  .nav .wrap { display: flex; align-items: center; gap: 36px; padding-top: 24px; padding-bottom: 24px; }
+  .menu { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--ink); cursor: pointer; margin-left: -11px; }
+  .links { display: flex; gap: 32px; list-style: none; }
+  .links a, .label, .side, .sticker, .pill-login { font-family: var(--mono); font-weight: 500; letter-spacing: .14em; text-transform: uppercase; font-size: 12px; }
+  .links a { display: inline-block; padding: 14px 0; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size 220ms var(--out); }
+  .links a:hover { background-size: 100% 1px; }
+  .pill-login { margin-left: auto; display: inline-flex; align-items: center; gap: 12px; border: 1.5px solid var(--ink); border-radius: 999px; padding: 8px 8px 8px 18px; min-height: 44px; transition: transform 160ms var(--out), background-color 160ms; }
+  .pill-login .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--yellow); }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; }
+  .hero .wrap { padding-top: 40px; padding-bottom: 64px; display: grid; grid-template-columns: minmax(0, 1fr) 640px; gap: 40px; align-items: center; min-height: calc(100vh - 92px); }
+  .label { line-height: 1.5; color: var(--ink); margin-bottom: 20px; }
+  h1 { font-weight: 900; font-size: clamp(56px, 7.8vw, 112px); line-height: .9; letter-spacing: -.06em; }
+  h1 .line { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+  h1 .line > span { display: inline-block; }
+  h1 .ydot { display: inline-block; width: .23em; height: .23em; border-radius: 50%; background: var(--yellow); margin-left: .04em; vertical-align: baseline; }
+  .sub { margin-top: 28px; max-width: 30em; font-size: 17px; line-height: 1.55; color: var(--muted); }
+  .cta { margin-top: 28px; display: inline-flex; align-items: center; gap: 10px; background: var(--yellow); color: var(--bg); font-weight: 500; font-size: 15px; padding: 16px 24px; border-radius: 999px; min-height: 52px; transition: transform 160ms var(--out), background-color 160ms var(--out); }
+  .cta svg { transition: transform 200ms var(--out); }
+
+  @media (hover: hover) {
+    .cta:hover { transform: translateY(-1px); background: #FFD43A; }
+    .cta:hover svg { transform: translateX(3px); }
+    .pill-login:hover { transform: translateY(-1px); background: rgba(245, 243, 239, .08); }
+  }
+  .cta:active, .pill-login:active { transform: scale(.97); }
+
+  /* ---------- visual stage (640 × 640, scaled by JS on small screens) ---------- */
+  .visual { width: 100%; max-width: 640px; aspect-ratio: 1; position: relative; justify-self: center; }
+  .stage { position: absolute; left: 0; top: 0; width: 640px; height: 640px; transform-origin: 0 0; transform: scale(var(--s, 1)); }
+  .ring { position: absolute; inset: 0; mask-image: conic-gradient(from 0deg, #000 var(--sweep), transparent 0); -webkit-mask-image: conic-gradient(from 0deg, #000 var(--sweep), transparent 0); }
+  .disc { position: absolute; left: 60px; top: 60px; width: 520px; height: 520px; border-radius: 50%; background: var(--yellow); }
+  .phone { position: absolute; left: 175px; top: 0; width: 289px; height: 625px; border-radius: 32px; overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, .45); background: var(--a-bg); }
+  .screen { width: 390px; height: 844px; transform: scale(.741); transform-origin: 0 0; color: var(--a-ink); display: flex; flex-direction: column; }
+
+  .sticker { position: absolute; left: var(--x); top: var(--y); }
+  .sticker > span { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; font-size: 13px; letter-spacing: .06em; white-space: nowrap; transform: rotate(var(--r)); transition: transform 240ms var(--out); border: 1.5px solid var(--ink); }
+  .sticker.y > span { background: var(--yellow); color: var(--bg); }
+  .sticker.o > span { background: var(--bg); color: var(--ink); }
+  @media (hover: hover) { .visual:hover .sticker > span:hover { transform: translateY(-2px) rotate(calc(var(--r) * .5)); } }
+
+  .side { position: absolute; right: 40px; bottom: 32px; line-height: 1.6; font-size: 11px; color: var(--ink); }
+
+  /* ---------- phone screen (the real app, light mode) ---------- */
+  .p-top { display: flex; align-items: center; gap: 8px; padding: 12px 16px 12px 24px; }
+  .p-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--a-ink); color: var(--a-bg); display: grid; place-items: center; font-weight: 500; font-size: 14px; }
+  .p-name { font-weight: 600; font-size: 16px; flex: 1; }
+  .p-ic { width: 44px; height: 44px; display: grid; place-items: center; }
+  .p-body { padding: 16px 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; overflow: hidden; }
+  .p-h1 { font-weight: 500; font-size: 24px; letter-spacing: -.015em; }
+  .p-meta { font-size: 14px; color: var(--a-muted); margin-top: -10px; }
+  .p-cont { background: var(--a-ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .p-cont .k { font-family: var(--mono); font-size: 12px; color: var(--yellow); }
+  .p-cont .t { color: var(--a-bg); font-weight: 600; font-size: 16px; line-height: 1.3; }
+  .p-bar { height: 6px; border-radius: 9px; background: rgba(255, 255, 255, .2); }
+  .p-bar i { display: block; width: 46%; height: 100%; border-radius: 9px; background: var(--yellow); }
+  .p-btn { align-self: flex-start; background: var(--yellow); color: var(--a-ink); font-weight: 500; font-size: 14px; padding: 10px 16px; border-radius: 999px; }
+  .p-sec { display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 500; }
+  .p-sec u { font-size: 14px; }
+  .p-card { background: var(--a-card); border: 1px solid var(--a-border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .p-card .c { font-family: var(--mono); font-size: 12px; }
+  .p-card .c em { font-family: var(--sans); font-style: normal; color: var(--a-muted); }
+  .p-card b { font-weight: 600; font-size: 16px; }
+  .p-card p { font-size: 14px; line-height: 1.5; color: var(--a-muted); }
+  .p-ad { height: 100px; border-radius: 10px; border: 1px dashed var(--a-border); background: var(--a-surface); font-size: 12px; color: var(--a-muted); padding: 8px 12px; }
+  .p-nav { display: flex; justify-content: space-between; padding: 8px 8px 20px; background: var(--a-card); border-top: 1px solid var(--a-border); }
+  .p-tab { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: var(--a-muted); padding: 4px 0; border-radius: 6px; }
+  .p-tab.on { background: var(--a-soft); color: var(--a-ink); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 1100px) {
+    .wrap { padding-left: 24px; padding-right: 24px; }
+    .hero .wrap { grid-template-columns: 1fr; padding-top: 24px; padding-bottom: 56px; gap: 48px; min-height: 0; }
+    .links { display: none; }
+    .nav .wrap { padding-top: 16px; padding-bottom: 16px; }
+    .visual { max-width: 560px; }
+  }
+  @media (max-width: 640px) {
+    .sub { font-size: 16px; }
+    .cta { width: 100%; justify-content: center; }
+    .side { display: none; }
+  }
+
+  /* ---------- intro (only for people who have not asked for reduced motion) ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .intro-pending [data-in] { opacity: 0; }
+
+    .intro-play .nav            { animation: rise 420ms var(--out) both; }
+    .intro-play .disc           { animation: disc 760ms var(--spring) 0ms both; }
+    .intro-play .ring           { animation: sweep 1000ms var(--sweep-ease) 120ms both; }
+    .intro-play .label          { animation: rise 520ms var(--out) 180ms both; }
+    .intro-play h1 .line > span { animation: line 760ms var(--out) both; animation-delay: calc(240ms + var(--i) * 90ms); }
+    .intro-play h1 .ydot        { animation: pop 520ms var(--slap) 980ms both; }
+    .intro-play .phone          { animation: drop 900ms var(--spring) 420ms both; }
+    .intro-play .sub            { animation: rise 520ms var(--out) 640ms both; }
+    .intro-play .cta            { animation: rise 520ms var(--out) 780ms both; }
+    .intro-play .sticker        { animation: slap 680ms var(--slap) both; animation-delay: calc(1080ms + var(--i) * 80ms); }
+    .intro-play .side           { animation: rise 520ms var(--out) 1560ms both; }
+  }
+  @keyframes rise  { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } }
+  @keyframes line  { from { transform: translateY(108%); filter: blur(8px); } }
+  @keyframes disc  { from { opacity: 0; transform: scale(.62); } 30% { opacity: 1; } }
+  @keyframes sweep { from { --sweep: 0deg; opacity: .2; } }
+  @keyframes pop   { from { opacity: 0; transform: scale(.4); } }
+  @keyframes drop  { from { opacity: 0; transform: translateY(-90px); filter: blur(6px); } 35% { opacity: 1; } }
+  @keyframes slap  { from { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(var(--spin)) scale(.9); } 25% { opacity: 1; } }
+
+  /* demo-only replay control */
+  .replay { position: fixed; left: 16px; bottom: 16px; font: 500 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: #1C1D21; border: 1px solid rgba(245, 243, 239, .18); border-radius: 999px; padding: 12px 16px; min-height: 44px; cursor: pointer; transition: transform 160ms var(--out), color 160ms; }
+  .replay:hover { color: var(--ink); }
+  .replay:active { transform: scale(.97); }
+  @media (prefers-reduced-motion: reduce) { .replay { display: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" data-in>
+ <div class="wrap">
+  <button class="menu" type="button" aria-expanded="false" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <nav aria-label="Main">
+    <ul class="links">
+      <li><a href="#">Subjects</a></li>
+      <li><a href="#">Papers</a></li>
+      <li><a href="#">Notices</a></li>
+      <li><a href="#">How it works</a></li>
+    </ul>
+  </nav>
+  <a class="pill-login" href="#">Student login <span class="dot" aria-hidden="true"></span></a>
+ </div>
+</header>
+
+<main id="main">
+ <section class="hero">
+ <div class="wrap">
+  <div class="copy">
+    <p class="label" data-in>Your branch's library,<br>finally in one place</p>
+    <h1 aria-label="Learn it. Share it. Ace it.">
+      <span class="line" aria-hidden="true"><span style="--i:0" data-in>Learn it.</span></span>
+      <span class="line" aria-hidden="true"><span style="--i:1" data-in>Share it.</span></span>
+      <span class="line" aria-hidden="true"><span style="--i:2" data-in>Ace it<span class="ydot" data-in></span></span></span>
+    </h1>
+    <p class="sub" data-in>Chapter notes, past question papers and college notices for AI-ML students. Every upload is checked, and the same file can never be added twice.</p>
+    <a class="cta" href="#" data-in>Sign in with roll number
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <div class="visual" aria-hidden="true">
+    <div class="stage">
+      <div class="disc" data-in></div>
+      <svg class="ring" data-in viewBox="0 0 640 640" width="640" height="640"><circle cx="320" cy="320" r="319" fill="none" stroke="#F5F3EF" stroke-width="1" stroke-dasharray="2 8"/></svg>
+
+      <div class="phone" data-in>
+        <div class="screen">
+          <div class="p-top"><span class="p-mark">A</span><span class="p-name">[App Name]</span>
+            <span class="p-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#08090B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+            <span class="p-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#08090B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span>
+          </div>
+          <div class="p-body">
+            <div class="p-h1">Good evening, Priya</div>
+            <div class="p-meta">III year · AI-ML · Semester 1</div>
+            <div class="p-cont"><span class="k">CONTINUE LEARNING</span><span class="t">Machine Learning · Ch 3 Neural networks</span><span class="p-bar"><i></i></span><span class="p-btn">Resume at page 14</span></div>
+            <div class="p-sec">Notices <u>See all</u></div>
+            <div class="p-card"><span class="c">EXAM <em>· 18 Nov</em></span><b>Mid-2 exam timetable released</b><p>Mid-2 exams for II and III year start on 2 December. Check your hall ticket by 28 November.</p></div>
+            <div class="p-ad">Advertisement</div>
+            <div class="p-sec">Your subjects <u>All 7</u></div>
+            <div class="p-card"><span class="c">AI3201</span><b>Machine Learning</b></div>
+          </div>
+          <div class="p-nav">
+            <span class="p-tab on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</span>
+            <span class="p-tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Subjects</span>
+            <span class="p-tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>Papers</span>
+            <span class="p-tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Upload</span>
+            <span class="p-tab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stickers: yellow first, then outlined. --fx/--fy = where each flies in from (toward its nearest edge). -->
+      <div class="sticker y" data-in style="--x:490px;--y:160px;--r:10deg;--i:0;--fx:320px;--fy:-40px;--spin:38deg"><span>6 chapters</span></div>
+      <div class="sticker y" data-in style="--x:-10px;--y:430px;--r:6deg;--i:1;--fx:-320px;--fy:60px;--spin:-30deg"><span>PDF · 3.1 MB</span></div>
+      <div class="sticker o" data-in style="--x:20px;--y:80px;--r:-8deg;--i:2;--fx:-300px;--fy:-120px;--spin:-36deg"><span>AI3201 · ML</span></div>
+      <div class="sticker o" data-in style="--x:510px;--y:10px;--r:-4deg;--i:3;--fx:260px;--fy:-220px;--spin:30deg"><span>Nov 2024 paper</span></div>
+      <div class="sticker o" data-in style="--x:440px;--y:520px;--r:-7deg;--i:4;--fx:300px;--fy:200px;--spin:-34deg"><span>✓ No duplicates</span></div>
+    </div>
+  </div>
+
+ </div>
+  <p class="side" data-in aria-hidden="true">Notes<br>Papers<br>Notices<br>Quizzes</p>
+ </section>
+</main>
+
+<button class="replay" type="button">↻ Replay intro</button>
+
+<script>
+  // Scale the fixed 640px stage to the visual's width on small screens.
+  (function () {
+    var vis = document.querySelector('.visual'), stage = document.querySelector('.stage');
+    var fit = function () { stage.style.setProperty('--s', Math.min(1, vis.clientWidth / 640)); };
+    fit(); if ('ResizeObserver' in window) new ResizeObserver(fit).observe(vis); else addEventListener('resize', fit);
+  })();
+  // Menu button reports its state (the menu panel itself comes with the app build).
+  document.querySelector('.menu').addEventListener('click', function () {
+    this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+  });
+  // Demo-only: restart the intro.
+  document.querySelector('.replay').addEventListener('click', function () {
+    var r = document.documentElement; r.classList.remove('intro-play'); void r.offsetWidth; r.classList.add('intro-play');
+  });
+</script>
+</body>
+</html>

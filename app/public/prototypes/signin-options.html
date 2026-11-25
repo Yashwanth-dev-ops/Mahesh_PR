@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sign-in animation options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&family=Schibsted+Grotesk:wght@400;500;600;800;900&display=swap" rel="stylesheet" />
+<style>
+  /* Prototype only (not part of the app): three sign-in success animations to choose from. */
+  :root { --bg: #08090b; --ink: #f5f3ef; --muted: #a8a49c; --field: #141518; --line: #3a3b40; --y: #ffc900; --ease: cubic-bezier(0.16, 1, 0.3, 1); --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 20.4%, 1.051 24.5%, 1.055 28.3%, 1.039 33.9%, 1.008 44.5%, 0.996 55.3%, 1); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #1c1d21; color: var(--ink); font-family: "Schibsted Grotesk", system-ui, sans-serif; }
+  header.top { max-width: 1240px; margin: 0 auto; padding: 32px 24px 8px; }
+  header.top h1 { margin: 0 0 6px; font-size: 28px; font-weight: 800; }
+  header.top p { margin: 0; color: var(--muted); line-height: 1.5; }
+  .row { max-width: 1240px; margin: 0 auto; padding: 24px; display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  .opt h2 { margin: 0 0 4px; font-size: 18px; }
+  .opt > p { margin: 0 0 14px; font-size: 14px; color: var(--muted); line-height: 1.5; min-height: 63px; }
+  .ctl { display: flex; gap: 8px; margin-bottom: 12px; }
+  .ctl button { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-weight: 500; cursor: pointer; }
+  .ctl button:first-child { background: var(--y); color: var(--bg); border-color: var(--y); }
+
+  /* phone frame */
+  .phone { position: relative; width: 340px; height: 660px; margin: 0 auto; border-radius: 34px; background: var(--bg); overflow: hidden; border: 1px solid #2b2c30; }
+  .screen { position: absolute; inset: 0; padding: 26px 24px; display: flex; flex-direction: column; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+  .mark { width: 24px; height: 24px; border-radius: 6px; background: var(--y); color: var(--bg); display: grid; place-items: center; font-size: 12px; }
+  .form { margin-top: 56px; display: flex; flex-direction: column; gap: 14px; transition: opacity 260ms var(--ease), translate 260ms var(--ease); }
+  .form h3 { margin: 0 0 6px; font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -0.015em; }
+  .lab { font-size: 13px; font-weight: 500; }
+  .inp { height: 48px; border-radius: 12px; background: var(--field); border: 1.5px solid var(--line); display: flex; align-items: center; padding: 0 14px; font-size: 15px; }
+  .inp.mono { font-family: "JetBrains Mono", monospace; letter-spacing: 0.06em; }
+  .err { font-size: 13px; color: #f07a6e; min-height: 18px; }
+  .btn { position: relative; align-self: flex-start; height: 50px; padding: 0 8px 0 22px; border-radius: 999px; background: var(--y); color: var(--bg); display: inline-flex; align-items: center; gap: 12px; font-weight: 600; font-size: 15px; }
+  .btn .disc { width: 34px; height: 34px; border-radius: 50%; background: var(--bg); color: var(--y); display: grid; place-items: center; }
+  .greet { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 10px; text-align: center; pointer-events: none; }
+  .greet .hi { font-size: 30px; font-weight: 900; letter-spacing: -0.015em; line-height: 1.1; }
+  .greet .sub { font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0; }
+  .ch { display: inline-block; opacity: 0; }
+
+  /* shared failure: soft shake + message */
+  .fail .inp.pw { border-color: #f07a6e; animation: shake 360ms var(--ease); }
+  @keyframes shake { 20% { translate: -6px 0; } 40% { translate: 5px 0; } 60% { translate: -3px 0; } 80% { translate: 2px 0; } }
+
+  /* ---------- A · Disc reveal: the button's yellow grows into the landing disc ---------- */
+  .A .flood { position: absolute; width: 34px; height: 34px; border-radius: 50%; background: var(--y); left: 0; top: 0; scale: 0; z-index: 3; }
+  .A .check { position: absolute; left: 50%; top: 40%; translate: -50% -50%; z-index: 4; opacity: 0; }
+  .A .check path { stroke-dasharray: 60; stroke-dashoffset: 60; }
+  .A .greet { z-index: 4; color: var(--bg); padding-top: 120px; }
+  .A.play .form { opacity: 0; translate: 0 -8px; }
+  .A.play .flood { animation: flood 800ms var(--ease) 120ms forwards; }
+  .A.play .check { animation: fadeIn 200ms 700ms forwards; }
+  .A.play .check path { animation: draw 420ms var(--ease) 760ms forwards; }
+  .A.play .ch { animation: rise 520ms var(--ease) forwards; animation-delay: calc(1000ms + var(--i) * 28ms); }
+  .A.play .sub { animation: fadeIn 400ms 1500ms forwards; }
+  @keyframes flood { to { scale: 46; } }
+
+  /* ---------- B · Button morph: button → spinning dashed ring → check ---------- */
+  .B .btn { transition: width 360ms var(--ease), padding 360ms var(--ease), border-radius 360ms var(--ease); overflow: hidden; }
+  .ring, .bcheck { display: none; }
+  .B .ring { display: block; position: absolute; inset: 5px; opacity: 0; }
+  .B .bcheck { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; color: var(--bg); }
+  .B.fail .ring, .B.fail .bcheck { display: none; }
+  .B .bcheck path { stroke-dasharray: 40; stroke-dashoffset: 40; }
+  .B .greet { align-content: end; padding-bottom: 150px; }
+  .B.play .btn { width: 50px; padding: 0; justify-content: center; }
+  .B.play .btn .label, .B.play .btn .disc { opacity: 0; transition: opacity 150ms; }
+  .B.play .bcheck { animation: fadeIn 150ms 1250ms forwards; }
+  .B.play .bcheck path { animation: draw 300ms var(--ease) 1280ms forwards; }
+  .B.play .ring { animation: fadeIn 200ms 300ms forwards, spin 900ms linear 300ms 1, fadeOut 200ms 1200ms forwards; }
+  .B.play .fields { animation: fadeOut 300ms 1450ms forwards; }
+  .B.play .btn { animation: lift 600ms var(--ease) 1450ms forwards; }
+  .B.play .ch { animation: rise 500ms var(--ease) forwards; animation-delay: calc(1650ms + var(--i) * 25ms); }
+  .B.play .sub { animation: fadeIn 400ms 2100ms forwards; }
+  @keyframes spin { to { rotate: 1turn; } }
+  @keyframes lift { to { translate: 0 -190px; } }
+
+  /* ---------- C · Ring around your photo (the landing intro's ring sweep) ---------- */
+  @property --sweep { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  .C .stage { position: absolute; left: 50%; top: 42%; width: 190px; height: 190px; translate: -50% -50%; }
+  .C .photo { position: absolute; inset: 24px; border-radius: 50%; background: var(--y) url("/avatars/technologist-3d.png") center 70% / 92% no-repeat; scale: 0.6; opacity: 0; }
+  .C .dring { position: absolute; inset: 0; mask-image: conic-gradient(#000 var(--sweep), transparent 0); -webkit-mask-image: conic-gradient(#000 var(--sweep), transparent 0); }
+  .C .greet { align-content: end; padding-bottom: 130px; }
+  .C.play .form { opacity: 0; translate: 0 10px; }
+  .C.play .photo { animation: pop 700ms var(--spring) 250ms forwards; }
+  .C.play .dring { animation: sweep 1000ms cubic-bezier(0.7, 0, 0.2, 1) 350ms forwards; }
+  .C.play .ch { animation: rise 520ms var(--ease) forwards; animation-delay: calc(1250ms + var(--i) * 28ms); }
+  .C.play .sub { animation: fadeIn 400ms 1750ms forwards; }
+  @keyframes sweep { to { --sweep: 360deg; } }
+  @keyframes pop { to { scale: 1; opacity: 1; } }
+
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes fadeOut { to { opacity: 0; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes rise { from { opacity: 0; translate: 0 0.4em; } to { opacity: 1; translate: 0 0; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Sign-in animation: pick one</h1>
+  <p>Press <b>Play</b> to see a correct sign-in, <b>Wrong password</b> to see the error. Each one plays once, then the app opens (here it just rests). The library card is gone in all three.</p>
+</header>
+<main class="row">
+  <section class="opt" data-k="A">
+    <h2>A · Disc reveal</h2>
+    <p>The yellow of the button grows into the landing page's big yellow disc and fills the screen, a check draws, then “Welcome back, Priya” rises letter by letter. Bold, about 1.8 s.</p>
+    <div class="ctl"><button data-play>Play</button><button data-fail>Wrong password</button></div>
+    <div class="phone A"></div>
+  </section>
+  <section class="opt" data-k="B">
+    <h2>B · Button morph</h2>
+    <p>The button shrinks into a circle, the landing's dashed ring spins while it checks, then turns into a check and rises, and the greeting appears. Quietest, best for a screen used every day. About 2 s.</p>
+    <div class="ctl"><button data-play>Play</button><button data-fail>Wrong password</button></div>
+    <div class="phone B"></div>
+  </section>
+  <section class="opt" data-k="C">
+    <h2>C · Ring around your photo</h2>
+    <p>The form fades, the student's own photo appears in the middle and the dashed ring draws round it like the landing intro, then the greeting. Most personal. About 1.9 s.</p>
+    <div class="ctl"><button data-play>Play</button><button data-fail>Wrong password</button></div>
+    <div class="phone C"></div>
+  </section>
+</main>
+<template id="screen">
+  <div class="screen">
+    <div class="brand"><span class="mark">A</span>[App Name]</div>
+    <div class="form">
+      <h3>Student login</h3>
+      <div class="fields" style="display:flex;flex-direction:column;gap:14px">
+        <span class="lab">Roll number</span><div class="inp mono">22AB1A4201</div>
+        <span class="lab">Password</span><div class="inp pw">••••••••</div>
+        <span class="err"></span>
+      </div>
+      <div class="btn"><span class="label">Sign in</span><span class="disc">→</span>
+        <svg class="ring" viewBox="0 0 62 62"><circle cx="31" cy="31" r="27" fill="none" stroke="#08090b" stroke-width="3" stroke-dasharray="4 6" stroke-linecap="round"/></svg>
+        <span class="bcheck"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="flood"></span>
+      </div>
+    </div>
+  </div>
+  <svg class="check" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#08090b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <div class="stage"><div class="photo"></div><svg class="dring" viewBox="0 0 190 190"><circle cx="95" cy="95" r="92" fill="none" stroke="#f5f3ef" stroke-width="1.5" stroke-dasharray="2 7"/></svg></div>
+  <div class="greet"><div class="hi"></div><div class="sub">22AB1A4201 · AI-ML</div></div>
+</template>
+<script>
+  const tpl = document.getElementById("screen");
+  const letters = (el, text) => { let i = 0; el.innerHTML = text.split(" ").map((w) => `<span style="white-space:nowrap">${[...w].map((c) => `<span class="ch" style="--i:${i++}">${c}</span>`).join("")}</span>`).join(" "); };
+  function reset(phone) {
+    phone.className = "phone " + phone.closest(".opt").dataset.k;
+    phone.replaceChildren(tpl.content.cloneNode(true));
+    const k = phone.closest(".opt").dataset.k;
+    if (k !== "A") phone.querySelector(".check").remove();
+    if (k !== "C") phone.querySelector(".stage").remove();
+    letters(phone.querySelector(".hi"), "Welcome back, Priya");
+    // place the A flood circle on the button's arrow disc
+    const disc = phone.querySelector(".disc"), fl = phone.querySelector(".flood"), b = disc.getBoundingClientRect(), p = phone.getBoundingClientRect();
+    if (fl) { fl.style.left = (b.left - p.left) + "px"; fl.style.top = (b.top - p.top) + "px"; phone.appendChild(fl); }
+  }
+  document.querySelectorAll(".opt").forEach((opt) => {
+    const phone = opt.querySelector(".phone");
+    reset(phone);
+    opt.querySelector("[data-play]").onclick = () => { reset(phone); requestAnimationFrame(() => requestAnimationFrame(() => phone.classList.add("play"))); };
+    opt.querySelector("[data-fail]").onclick = () => { reset(phone); phone.querySelector(".err").textContent = "Roll number or password is wrong."; requestAnimationFrame(() => phone.classList.add("fail")); };
+  });
+</script>
+</body>
+</html>

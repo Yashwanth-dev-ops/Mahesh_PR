@@ -1,0 +1,43 @@
+/* Pill buttons. Motion pattern taken from the AMENOP PillCTA / OutlineCTA:
+   a second colour floods out on hover/press, the arrow swaps, the pill leans toward the pointer.
+   JS owns `translate` (magnet), CSS owns `scale` (press) and colour, so they never fight. */
+.pill-pill {
+  position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center;
+  border-radius: 999px; font-weight: 500; -webkit-tap-highlight-color: transparent;
+  transition: scale 120ms var(--ease-out), color 200ms var(--ease-out);
+}
+.pill-pill:active { scale: 0.97; }
+
+/* Primary: yellow pill with a black arrow disc; warm white floods out from the disc. */
+.pill-cta { gap: 14px; padding: 8px 8px 8px 26px; font-size: 16px; background: #ffc900; color: #08090b; min-height: 56px; }
+.pill-flood {
+  position: absolute; right: 28px; top: 50%; z-index: -1; width: 12px; height: 12px; border-radius: 50%;
+  background: #f5f3ef; transform: translate(50%, -50%) scale(0);
+  @media (prefers-reduced-motion: no-preference) { transition: transform 450ms var(--ease-out); }
+}
+.pill-disc { position: relative; width: 40px; height: 40px; border-radius: 50%; background: #08090b; color: #ffc900; display: grid; place-items: center; overflow: hidden; }
+.pill-arrow { width: 20px; height: 20px; @media (prefers-reduced-motion: no-preference) { transition: transform 300ms var(--ease-out); } }
+.pill-arrowIn { position: absolute; transform: translateX(-150%); }
+
+/* Button version of the CTA (forms). */
+.pill-btn { border: 0; cursor: pointer; font: inherit; font-weight: 500; font-size: 16px; }
+
+/* Nav login: yellow pill; warm white fills up from the bottom. */
+.pill-login {
+  padding: 0 22px; min-height: 44px; background: #ffc900; color: #08090b;
+  font-family: var(--font-jetbrains), monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.pill-fill { position: absolute; inset: 0; z-index: -1; border-radius: 999px; background: #f5f3ef; transform: translateY(101%); @media (prefers-reduced-motion: no-preference) { transition: transform 400ms var(--ease-out); } }
+
+@media (hover: hover) {
+  .pill-cta:hover .pill-flood { transform: translate(50%, -50%) scale(90); }
+  .pill-cta:hover .pill-arrow { transform: translateX(150%); }
+  .pill-cta:hover .pill-arrowIn { transform: translateX(0); }
+  .pill-login:hover .pill-fill { transform: translateY(0); }
+}
+/* 90 × 12px = 1080px circle: covers a full-width (up to ~500px) form button from the disc, not just the short pill */
+.pill-cta:active .pill-flood { transform: translate(50%, -50%) scale(90); transition-duration: 300ms; }
+.pill-login:active .pill-fill { transform: translateY(0); }
+
+/* Reduced motion: the flood, arrow and fill above only transition under no-preference, so they change instantly;
+   the colour change on .pill-pill keeps its 200ms (not movement). */

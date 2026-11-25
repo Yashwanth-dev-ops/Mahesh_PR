@@ -1,0 +1,69 @@
+/* The real app home screen (light mode), drawn at 390 x 844 and scaled into the 289 px phone. */
+.ph-screen {
+  width: 390px; height: 844px; transform: scale(0.741); transform-origin: 0 0;
+  display: flex; flex-direction: column; background: #f5f3ef; color: #08090b;
+}
+.ph-top { display: flex; align-items: center; gap: 8px; padding: 12px 16px 12px 24px; }
+.ph-mark { width: 28px; height: 28px; border-radius: 6px; background: #08090b; color: #f5f3ef; display: grid; place-items: center; font-weight: 500; font-size: 14px; }
+.ph-name { font-weight: 600; font-size: 16px; flex: 1; }
+.ph-ic { width: 44px; height: 44px; display: grid; place-items: center; }
+.ph-body { flex: 1; overflow: hidden; }
+.ph-scroll { padding: 16px 24px; display: flex; flex-direction: column; gap: 16px; }
+.ph-h1 { font-weight: 500; font-size: 24px; letter-spacing: -0.015em; }
+.ph-meta { font-size: 14px; color: #5a5750; margin-top: -10px; }
+.ph-cont { background: #08090b; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.ph-k { font-family: var(--font-jetbrains), monospace; font-size: 12px; color: #ffc900; }
+.ph-t { color: #f5f3ef; font-weight: 600; font-size: 16px; line-height: 1.3; }
+.ph-bar { height: 6px; border-radius: 9px; background: rgba(255, 255, 255, 0.2); }
+.ph-bar i { display: block; width: 62%; transform-origin: 0 50%; height: 100%; border-radius: 9px; background: #ffc900; }
+.ph-btn { align-self: flex-start; background: #ffc900; font-weight: 500; font-size: 14px; padding: 10px 16px; border-radius: 999px; }
+.ph-sec { display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 500; }
+.ph-sec u { font-size: 14px; }
+.ph-card { background: #fff; border: 1px solid #dedad2; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.ph-c { font-family: var(--font-jetbrains), monospace; font-size: 12px; }
+.ph-c em { font-family: var(--font-schibsted), sans-serif; font-style: normal; color: #5a5750; }
+.ph-card b { font-weight: 600; font-size: 16px; }
+.ph-card p { font-size: 14px; line-height: 1.5; color: #5a5750; margin: 0; }
+.ph-nav { display: flex; justify-content: space-between; padding: 8px 8px 20px; background: #fff; border-top: 1px solid #dedad2; }
+.ph-tab { width: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #5a5750; padding: 4px 0; border-radius: 6px; }
+.ph-on { background: #fff0b3; color: #08090b; }
+.ph-ch { font-size: 13px; color: #5a5750; }
+/* The new notice wrapper owns the gap below it, so it can collapse to nothing. */
+.ph-new { margin-bottom: -16px; overflow: hidden; max-height: 140px; }
+.ph-new > .ph-card { margin-bottom: 16px; border-color: #ffc900; }
+.ph-screen { position: relative; overflow: hidden; contain: layout paint style; } /* its looping demo never re-lays out the page */
+.ph-ic { position: relative; }
+.ph-badge { position: absolute; top: 9px; right: 10px; width: 9px; height: 9px; border-radius: 50%; background: #b42318; border: 2px solid #f5f3ef; }
+.ph-btn { position: relative; }
+
+/* A fingertip: shows where the "user" touches. */
+.ph-tap {
+  position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%;
+  background: rgba(8, 9, 11, 0.22); border: 2px solid rgba(255, 255, 255, 0.7); opacity: 0; pointer-events: none;
+}
+
+/* Reader screen, parked off to the right until Resume is tapped. */
+.ph-reader { position: absolute; inset: 0; display: flex; flex-direction: column; background: #f5f3ef; transform: translateX(100%); }
+.ph-rtop { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #dedad2; }
+.ph-back { position: relative; width: 44px; height: 44px; display: grid; place-items: center; }
+.ph-rt { flex: 1; font-weight: 600; font-size: 15px; }
+.ph-pg { font-family: var(--font-jetbrains), monospace; font-size: 13px; color: #5a5750; }
+.ph-pg > span { display: inline-grid; }
+.ph-pg b { grid-area: 1 / 1; font-weight: 500; color: #08090b; }
+.ph-pg b + b { opacity: 0; }
+.ph-pages { position: relative; flex: 1; overflow: hidden; }
+.ph-page {
+  position: absolute; inset: 16px; padding: 22px; background: #fff; border: 1px solid #dedad2; border-radius: 10px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.ph-page > b { font-size: 19px; font-weight: 600; margin-bottom: 4px; }
+.ph-pB { transform: translateX(110%); }
+.ph-line { height: 9px; border-radius: 9px; background: #e4e0d8; }
+.ph-fig { width: 100%; height: auto; margin: 10px 0; }
+.ph-swipe { left: 78%; top: 52%; }
+.ph-rfoot { padding: 12px 24px 24px; }
+.ph-rfoot span { display: block; text-align: center; padding: 14px; border-radius: 999px; border: 1.5px solid #08090b; font-weight: 500; font-size: 15px; }
+
+/* The demo session is one GSAP timeline in PhonePreview.tsx (playDemo). These resting styles are the still frame
+   shown with reduced motion (or before the script loads): the home screen after a session, nothing moving. */
+.ph-veil { position: absolute; inset: 0; background: #f5f3ef; pointer-events: none; opacity: 0; visibility: hidden; }

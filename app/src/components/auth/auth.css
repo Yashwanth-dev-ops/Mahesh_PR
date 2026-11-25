@@ -1,0 +1,156 @@
+/* Sign-in pages (Figma "Login redesign", 2026-11-25): the landing's dark world (midnight, warm white, yellow).
+   One simple centred column. Laptop (≥960px): logo and Privacy in the top corners, form centred on the page.
+   Height budget: no page scrolls at 1366×607, 1440×900, 390×664 or 360×640. Spacing: 8 / 16 / 24 / 32. */
+.au-page {
+  --a-bg: #08090b;
+  --a-ink: #f5f3ef;
+  --a-muted: #a8a49c;
+  --a-field: #141518;
+  --a-line: #3a3b40;
+  --a-yellow: #ffc900;
+  --a-danger: #f07a6e;
+  min-height: 100svh; background: var(--a-bg); color: var(--a-ink); overflow-x: clip;
+}
+.au-page ::selection { background: var(--a-yellow); color: var(--a-bg); }
+
+/* ---------- frame ---------- */
+.au-side { min-height: 100svh; display: flex; flex-direction: column; }
+.au-top { padding: 16px 24px 0; }
+.au-top { display: flex; justify-content: space-between; align-items: center; }
+.au-privacy { padding: 12px 0; font-size: 14px; color: var(--a-muted); text-decoration: underline; text-underline-offset: 3px; }
+.au-home { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 600; font-size: 16px; }
+.au-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--a-yellow); color: var(--a-bg); display: grid; place-items: center; font-size: 14px; }
+.au-main { flex: 1; padding: 32px 24px 24px; }
+.au-panel { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 24px; }
+
+@media (min-width: 960px) {
+  .au-page { position: relative; }
+  .au-top { position: absolute; left: 64px; right: 64px; top: 40px; padding: 0; z-index: 1; }
+  .au-main { display: grid; place-items: center; padding: 24px 32px; }
+
+}
+
+/* ---------- heading ---------- */
+.au-head { display: flex; flex-direction: column; gap: 8px; }
+.au-kicker { margin: 0; font-family: var(--font-jetbrains), monospace; font-weight: 500; font-size: 12px; line-height: 1.5; letter-spacing: 0.14em; text-transform: uppercase; color: var(--a-yellow); }
+.au-h1 { margin: 0; font-weight: 900; font-size: 36px; line-height: 1.1; letter-spacing: -0.015em; text-wrap: balance; }
+@media (min-width: 960px) { .au-h1 { font-size: 40px; } }
+/* Small phones (360px): a size down so "Create an account" stays on one line. */
+@media (max-width: 379px) { .au-h1 { font-size: 32px; } .au-main { padding: 16px 24px; } .au-panel { gap: 20px; } }
+/* The intro line doubles as the place errors appear, so an error never pushes the form down. */
+.au-lead { margin: 0; font-size: 15px; line-height: 22px; color: var(--a-muted); }
+.au-lead:empty { display: none; }
+.au-leadErr { color: var(--a-danger); }
+
+/* ---------- form ---------- */
+.au-form { display: flex; flex-direction: column; gap: 16px; }
+.au-step { display: flex; flex-direction: column; gap: 16px; }
+.au-step[hidden] { display: none; }
+.au-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.au-field label { font-size: 15px; font-weight: 500; }
+.au-labelRow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.au-labelRow > p { text-align: right; }
+.au-hint { margin: 0; font-size: 14px; line-height: 1.45; color: var(--a-muted); }
+.au-err { margin: 0; font-size: 14px; line-height: 1.45; color: var(--a-danger); }
+.au-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: end; } /* boxes stay level when one label wraps */
+
+.au-small, .au-alt a {
+  color: var(--a-ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(245, 243, 239, 0.4);
+  transition: text-decoration-color 200ms var(--ease-out);
+}
+.au-small { font-size: 14px; padding: 12px 0; margin: -12px 0; } /* bigger tap area without moving the field below */
+.au-alt a { padding: 14px 0; } /* 44px tap area, same look */
+@media (hover: hover) { .au-small:hover, .au-alt a:hover { text-decoration-color: var(--a-yellow); } }
+
+.au-field input, .au-field select {
+  width: 100%; min-height: 48px; padding: 0 18px; border-radius: 14px;
+  background: var(--a-field); color: var(--a-ink); border: 1.5px solid var(--a-line);
+  font: inherit; font-size: 16px; caret-color: var(--a-yellow); /* 16px: iPhone doesn't zoom on tap */
+  transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+}
+.au-field input[name="roll"] { font-family: var(--font-jetbrains), monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+.au-field input::placeholder { color: #7d7a73; text-transform: none; }
+.au-field select { appearance: none; padding-right: 44px; cursor: pointer;
+  background: var(--a-field) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23f5f3ef' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 8 5 5 5-5'/%3E%3C/svg%3E") no-repeat right 16px center; }
+.au-field select:invalid, .au-field select:has(option[value='']:checked) { color: #7d7a73; }
+.au-field option { color: var(--a-ink); background: var(--a-field); }
+.au-field input:focus, .au-field select:focus { outline: none; border-color: var(--a-yellow); box-shadow: 0 0 0 3px rgba(255, 201, 0, 0.18); }
+.au-field [aria-invalid] { border-color: var(--a-danger); }
+
+.au-pw { position: relative; }
+.au-pw input { padding-right: 84px; }
+.au-show {
+  position: absolute; right: 2px; top: 50%; translate: 0 -50%; min-width: 64px; min-height: 44px; border-radius: 12px;
+  background: none; border: 0; color: var(--a-ink); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+@media (hover: hover) { .au-show:hover { background: #1f2024; } }
+
+/* Main button: full width, label centred (an invisible 40px spacer balances the arrow disc). */
+.au-actions { display: flex; gap: 12px; margin-top: 8px; }
+.au-page .pill-cta { flex: 1; min-height: 52px; padding: 6px; justify-content: space-between; }
+.au-page .pill-cta::before { content: ""; width: 40px; flex: none; }
+.au-back {
+  min-height: 52px; padding: 0 22px; border-radius: 999px; border: 1.5px solid var(--a-line); background: none; color: var(--a-ink);
+  font: inherit; font-size: 16px; font-weight: 500; cursor: pointer; transition: border-color 160ms var(--ease-out), scale 120ms var(--ease-out);
+}
+.au-back:active { scale: 0.97; }
+@media (hover: hover) { .au-back:hover { border-color: var(--a-ink); } }
+
+.au-alt { margin: 0; font-size: 15px; color: var(--a-muted); }
+/* Sign-up step 2 is only the form: Google and the log-in link belong to step 1. */
+.au-panel:has(.au-form[data-step="2"]) :is(.au-google, .au-alt) { display: none; }
+
+/* Consent page: three short points, and a sign-out button styled as a link */
+.au-points { margin: 0; padding-left: 20px; list-style: disc; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.5; color: var(--a-muted); }
+.au-linkBtn { padding: 14px 0; border: 0; background: none; color: var(--a-ink); font: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(245, 243, 239, 0.4); cursor: pointer; }
+
+/* Consent (DPDP Act): checkbox + one line, the whole line is tappable */
+.au-consent { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; line-height: 20px; color: var(--a-muted); }
+.au-consent input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--a-yellow); cursor: pointer; }
+.au-consent label { cursor: pointer; }
+.au-consent a { color: var(--a-ink); text-decoration: underline; text-underline-offset: 3px; }
+.au-consent input[aria-invalid] { outline: 2px solid var(--a-danger); outline-offset: 2px; }
+.au-consent:has(input[aria-invalid]) label { color: var(--a-danger); } /* error text is for screen readers; the red line says it */
+.au-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* Sign-up step 2 carries the most fields: slightly tighter so it still fits a phone screen without scrolling. */
+.au-form[data-step="2"] .au-step { gap: 12px; }
+.au-form[data-step] .au-actions { margin-top: 0; }
+
+/* Photo picker */
+.au-file { position: relative; display: flex; align-items: center; gap: 16px; min-height: 48px; }
+.au-file input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.au-fileBtn {
+  flex: none; padding: 12px 18px; border-radius: 999px; border: 1.5px solid var(--a-ink); font-size: 15px; font-weight: 500; line-height: 1.2;
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.au-fileName { font-size: 14px; color: var(--a-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (hover: hover) { .au-file:hover .au-fileBtn { background: var(--a-ink); color: var(--a-bg); } }
+.au-file:has(input:focus-visible) .au-fileBtn { outline: 2px solid var(--a-yellow); outline-offset: 3px; }
+.au-file:has(input[aria-invalid]) .au-fileBtn { border-color: var(--a-danger); }
+.au-thumb { width: 48px; height: 48px; flex: none; border-radius: 14px; object-fit: cover; border: 1.5px solid var(--a-ink); }
+
+/* Messages that replace a form (sign-up done, reset link sent, account waiting) */
+.au-done { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: var(--a-field); border: 1.5px solid var(--a-line); font-size: 15px; line-height: 1.55; color: var(--a-muted); }
+.au-done p { margin: 0; }
+.au-doneTitle { color: var(--a-ink); font-size: 20px; font-weight: 600; }
+.au-done .au-small { align-self: flex-start; }
+
+/* "or" divider + Google */
+.au-google { display: flex; flex-direction: column; gap: 12px; }
+.au-or { display: flex; align-items: center; gap: 12px; color: var(--a-muted); font-size: 14px; }
+.au-or::before, .au-or::after { content: ""; flex: 1; height: 1px; background: var(--a-line); }
+.au-gbtn {
+  width: 100%; min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  border-radius: 999px; border: 1.5px solid var(--a-line); background: var(--a-field); color: var(--a-ink);
+  font: inherit; font-size: 16px; font-weight: 500; cursor: pointer;
+  transition: border-color 160ms var(--ease-out), background-color 160ms var(--ease-out), scale 120ms var(--ease-out);
+}
+@media (hover: hover) { .au-gbtn:hover { border-color: var(--a-ink); background: #1a1b1f; } }
+.au-gbtn:active { scale: 0.98; }
+.au-gbtn[aria-busy] { cursor: progress; opacity: 0.75; }
+
+/* Entrance: a quick fade (180ms). Movement only when motion is allowed. */
+.au-panel { animation: au-fade 180ms var(--ease-out) both; }
+@media (prefers-reduced-motion: no-preference) { .au-panel { animation-name: au-in; } }
+@keyframes au-fade { from { opacity: 0; } }
+@keyframes au-in { from { opacity: 0; translate: 0 6px; } }

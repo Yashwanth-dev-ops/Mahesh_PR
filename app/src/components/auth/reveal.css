@@ -1,0 +1,47 @@
+/* Disc reveal (RevealHost, mounted in the root layout so it survives the page change).
+   loading: the button's yellow grows to fill the screen; a dashed ring spins in a black badge while we check.
+   ok:      a check draws in the badge, "Welcome back, <name>" rises letter by letter.
+   leaving: once the next page is on screen, the yellow closes like a shrinking circle and reveals it.
+   closing: wrong details: the yellow shrinks back into the button. */
+@property --rv-sweep { syntax: "<angle>"; inherits: false; initial-value: 360deg; }
+.rv { --rv-bg: #08090b; --rv-y: #ffc900; position: fixed; inset: 0; z-index: 90; pointer-events: none; color: var(--rv-bg);
+  font-family: var(--font-schibsted), system-ui, sans-serif; }
+.rv-disc { position: absolute; left: var(--x); top: var(--y); width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; background: var(--rv-y); scale: var(--s); }
+.rv-body { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 22px; padding: 24px; text-align: center; }
+.rv-badge { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
+.rv-ring { position: absolute; inset: 0; color: var(--rv-bg); }
+.rv-dot { width: 84px; height: 84px; border-radius: 50%; background: var(--rv-bg); color: var(--rv-y); display: grid; place-items: center; box-shadow: 0 18px 40px rgba(8, 9, 11, 0.22); }
+.rv-check { opacity: 0; }
+.rv-check path { stroke-dasharray: 30; stroke-dashoffset: 0; }
+.rv-hi { margin: 0; max-width: 14ch; font-size: clamp(40px, 10.5vw, 80px); font-weight: 900; letter-spacing: -0.025em; line-height: 1.04; text-wrap: balance; min-height: 1.04em; }
+.rv-hi .w { white-space: nowrap; }
+.rv-sub { margin: 0; font-family: var(--font-jetbrains), monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; min-height: 1.2em; }
+.rv[data-phase="loading"] .rv-sub { text-transform: none; letter-spacing: 0.02em; font-size: 14px; }
+.rv[data-phase="ok"] .rv-check, .rv[data-phase="leaving"] .rv-check { opacity: 1; }
+.rv[data-phase="leaving"] { clip-path: circle(0% at 50% 50%); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .rv-disc { scale: 0; animation: rv-flood 700ms cubic-bezier(0.7, 0, 0.2, 1) forwards; }
+  .rv-dot { scale: 0; animation: rv-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 480ms forwards; }
+  .rv[data-phase="loading"] .rv-ring { opacity: 0; animation: rv-in 250ms 600ms forwards, rv-spin 1.4s linear 600ms infinite; }
+  .rv[data-phase="ok"] .rv-ring, .rv[data-phase="leaving"] .rv-ring {
+    mask-image: conic-gradient(#000 var(--rv-sweep), transparent 0); -webkit-mask-image: conic-gradient(#000 var(--rv-sweep), transparent 0);
+    animation: rv-sweep 700ms cubic-bezier(0.7, 0, 0.2, 1) both; }
+  .rv[data-phase="loading"] .rv-sub { opacity: 0; animation: rv-in 250ms 600ms forwards; }
+  .rv[data-phase="ok"] .rv-check path { stroke-dashoffset: 30; animation: rv-draw 360ms var(--ease-out) forwards; }
+  .rv[data-phase="ok"] .rv-hi .c { display: inline-block; opacity: 0; animation: rv-rise 520ms var(--ease-out) forwards; animation-delay: calc(160ms + var(--i) * 24ms); }
+  .rv[data-phase="ok"] .rv-sub { opacity: 0; animation: rv-up 440ms var(--ease-out) 560ms forwards; }
+  .rv[data-phase="leaving"] { clip-path: circle(150% at 50% 50%); animation: rv-iris 720ms cubic-bezier(0.7, 0, 0.2, 1) 120ms forwards; }
+  .rv[data-phase="closing"] .rv-disc { animation: rv-unflood 420ms cubic-bezier(0.7, 0, 0.2, 1) forwards; }
+  .rv[data-phase="closing"] .rv-body { opacity: 0; transition: opacity 150ms; }
+}
+@keyframes rv-flood { to { scale: var(--s); } }
+@keyframes rv-unflood { from { scale: var(--s); } to { scale: 0; } }
+@keyframes rv-pop { to { scale: 1; } }
+@keyframes rv-in { to { opacity: 1; } }
+@keyframes rv-spin { to { rotate: 1turn; } }
+@keyframes rv-sweep { from { --rv-sweep: 0deg; } to { --rv-sweep: 360deg; } }
+@keyframes rv-draw { to { stroke-dashoffset: 0; } }
+@keyframes rv-rise { from { opacity: 0; translate: 0 0.45em; } to { opacity: 1; translate: 0 0; } }
+@keyframes rv-up { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes rv-iris { to { clip-path: circle(0% at 50% 50%); } }

@@ -1,0 +1,416 @@
+{
+ "notes": {
+  "Python Programming": [
+   {
+    "title": "Chapter 1: Python Basics",
+    "sections": [
+     {
+      "heading": "Introduction",
+      "text": "Python is a high-level, interpreted language known for its readable syntax. It is widely used in data science and AI."
+     },
+     {
+      "heading": "Variables and Data Types",
+      "text": "A variable stores a value. Common types are int, float, str, bool, list, tuple, dict and set. Python infers the type from the value."
+     },
+     {
+      "heading": "Control Flow",
+      "text": "if, elif and else make decisions. for and while loops repeat code."
+     },
+     {
+      "heading": "Example",
+      "text": "for i in range(3): print(i) prints 0, 1 and 2."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 2: Functions and Modules",
+    "sections": [
+     {
+      "heading": "Functions",
+      "text": "def defines a reusable block of code. Use return to send a value back."
+     },
+     {
+      "heading": "Modules",
+      "text": "import brings in code from other files or libraries, for example import math."
+     },
+     {
+      "heading": "Libraries for AI",
+      "text": "NumPy handles arrays, pandas handles tables, Matplotlib draws charts and scikit-learn provides machine learning tools."
+     },
+     {
+      "heading": "Example",
+      "text": "def square(x): return x * x. Then square(4) gives 16."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 3: NumPy and pandas",
+    "sections": [
+     {
+      "heading": "NumPy",
+      "text": "NumPy provides fast n-dimensional arrays and mathematical functions that work on whole arrays at once."
+     },
+     {
+      "heading": "pandas",
+      "text": "pandas provides the DataFrame, a table of rows and columns used to load, clean and analyse data."
+     },
+     {
+      "heading": "Common Operations",
+      "text": "Selecting columns, filtering rows, grouping, handling missing values and merging tables."
+     },
+     {
+      "heading": "Example",
+      "text": "import numpy as np; a = np.array([1, 2, 3]); a * 2 gives [2, 4, 6]."
+     }
+    ]
+   }
+  ],
+  "Mathematics for ML": [
+   {
+    "title": "Chapter 1: Linear Algebra",
+    "sections": [
+     {
+      "heading": "Vectors and Matrices",
+      "text": "A vector is an ordered list of numbers. A matrix is a rectangular grid of numbers. Data sets are often stored as matrices."
+     },
+     {
+      "heading": "Dot Product",
+      "text": "The dot product of two vectors multiplies matching entries and adds the results. It measures how aligned two vectors are."
+     },
+     {
+      "heading": "Matrix Multiplication",
+      "text": "An m × n matrix can multiply an n × p matrix to give an m × p matrix. Neural network layers rely on this operation."
+     },
+     {
+      "heading": "Example",
+      "text": "For [1, 2] · [3, 4], the dot product is 1×3 + 2×4 = 11."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 2: Probability and Statistics",
+    "sections": [
+     {
+      "heading": "Probability",
+      "text": "Probability measures how likely an event is, from 0 (impossible) to 1 (certain)."
+     },
+     {
+      "heading": "Mean and Variance",
+      "text": "The mean is the average value. Variance measures how far values spread from the mean. Standard deviation is its square root."
+     },
+     {
+      "heading": "Bayes’ Theorem",
+      "text": "P(A|B) = P(B|A) × P(A) / P(B). It updates a belief after seeing new evidence."
+     },
+     {
+      "heading": "Example",
+      "text": "The mean of 2, 4 and 6 is (2 + 4 + 6) / 3 = 4."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 3: Calculus and Optimisation",
+    "sections": [
+     {
+      "heading": "Derivative",
+      "text": "A derivative gives the rate of change of a function at a point."
+     },
+     {
+      "heading": "Gradient",
+      "text": "The gradient is the vector of partial derivatives. It points in the direction of steepest increase."
+     },
+     {
+      "heading": "Gradient Descent",
+      "text": "Repeatedly update the parameters against the gradient: w = w − η × gradient, where η is the learning rate."
+     },
+     {
+      "heading": "Example",
+      "text": "For f(x) = x², the derivative is 2x, so at x = 3 the slope is 6."
+     }
+    ]
+   }
+  ],
+  "Machine Learning": [
+   {
+    "title": "Chapter 1: Introduction to ML",
+    "sections": [
+     {
+      "heading": "What is Machine Learning?",
+      "text": "Machine learning lets computers learn patterns from data and use them to make predictions or decisions."
+     },
+     {
+      "heading": "Types of Learning",
+      "text": "Supervised learning uses labelled data. Unsupervised learning finds structure in unlabelled data. Reinforcement learning learns from rewards and penalties."
+     },
+     {
+      "heading": "ML Workflow",
+      "text": "Collect data, clean it, choose features, train a model, evaluate it and then deploy it."
+     },
+     {
+      "heading": "Example",
+      "text": "Predicting house prices from size and location is a supervised regression problem."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 2: Supervised Learning",
+    "sections": [
+     {
+      "heading": "Regression and Classification",
+      "text": "Regression predicts a number. Classification predicts a category."
+     },
+     {
+      "heading": "Common Algorithms",
+      "text": "Linear regression, logistic regression, decision trees, random forests, k-nearest neighbours and support vector machines."
+     },
+     {
+      "heading": "Train and Test Split",
+      "text": "Data is divided so the model is trained on one part and tested on unseen data to check how well it generalises."
+     },
+     {
+      "heading": "Overfitting",
+      "text": "Overfitting happens when a model memorises the training data and performs poorly on new data. Regularisation and more data help reduce it."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 3: Model Evaluation",
+    "sections": [
+     {
+      "heading": "Accuracy",
+      "text": "Accuracy is the share of predictions that are correct."
+     },
+     {
+      "heading": "Precision and Recall",
+      "text": "Precision is the share of predicted positives that are correct. Recall is the share of actual positives that were found."
+     },
+     {
+      "heading": "Cross-Validation",
+      "text": "The data is split into several folds. The model is trained and tested on different folds to get a more reliable score."
+     },
+     {
+      "heading": "Example",
+      "text": "If 90 of 100 predictions are correct, the accuracy is 90%."
+     }
+    ]
+   }
+  ],
+  "Deep Learning": [
+   {
+    "title": "Chapter 1: Neural Networks",
+    "sections": [
+     {
+      "heading": "Neuron",
+      "text": "An artificial neuron takes inputs, multiplies them by weights, adds a bias and passes the result through an activation function."
+     },
+     {
+      "heading": "Layers",
+      "text": "A network has an input layer, one or more hidden layers and an output layer. Deep learning uses many hidden layers."
+     },
+     {
+      "heading": "Activation Functions",
+      "text": "ReLU, sigmoid and tanh add non-linearity so the network can learn complex patterns."
+     },
+     {
+      "heading": "Example",
+      "text": "A neuron with output = ReLU(w·x + b) returns 0 for negative values and the value itself otherwise."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 2: Training Networks",
+    "sections": [
+     {
+      "heading": "Loss Function",
+      "text": "The loss measures how far predictions are from the true values, for example mean squared error or cross-entropy."
+     },
+     {
+      "heading": "Backpropagation",
+      "text": "Backpropagation uses the chain rule to compute how the loss changes with each weight."
+     },
+     {
+      "heading": "Optimisers",
+      "text": "Optimisers such as SGD and Adam update the weights using the gradients."
+     },
+     {
+      "heading": "Epochs and Batches",
+      "text": "An epoch is one full pass over the training data. A batch is a small group of samples processed together."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 3: CNNs, RNNs and Transformers",
+    "sections": [
+     {
+      "heading": "Convolutional Neural Networks",
+      "text": "CNNs use filters that slide over an image to detect edges, shapes and textures. They are widely used for image tasks."
+     },
+     {
+      "heading": "Recurrent Neural Networks",
+      "text": "RNNs process sequences by passing a hidden state from one step to the next. LSTM and GRU variants handle longer sequences."
+     },
+     {
+      "heading": "Transformers",
+      "text": "Transformers use attention to relate every word in a sequence to every other word. They power modern language models."
+     },
+     {
+      "heading": "Example",
+      "text": "A CNN can classify a photo as a cat or a dog."
+     }
+    ]
+   }
+  ],
+  "Natural Language Processing (NLP)": [
+   {
+    "title": "Chapter 1: Text Preprocessing",
+    "sections": [
+     {
+      "heading": "Tokenization",
+      "text": "Tokenization splits text into smaller units such as words or subwords."
+     },
+     {
+      "heading": "Stop Words",
+      "text": "Stop words are very common words like the and is. They are often removed because they add little meaning."
+     },
+     {
+      "heading": "Stemming and Lemmatization",
+      "text": "Stemming chops word endings. Lemmatization reduces a word to its dictionary form, for example running becomes run."
+     },
+     {
+      "heading": "Example",
+      "text": "The sentence Cats are running can be tokenised into Cats, are, running."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 2: Text Representation",
+    "sections": [
+     {
+      "heading": "Bag of Words",
+      "text": "Represents a document by counting how often each word appears, ignoring word order."
+     },
+     {
+      "heading": "TF-IDF",
+      "text": "TF-IDF gives a word a higher score when it is frequent in a document but rare across the whole collection."
+     },
+     {
+      "heading": "Word Embeddings",
+      "text": "Embeddings such as Word2Vec and GloVe map words to dense vectors where similar words are close together."
+     },
+     {
+      "heading": "Example",
+      "text": "In an embedding space, the vectors for king and queen are close to each other."
+     }
+    ]
+   },
+   {
+    "title": "Chapter 3: NLP Tasks and Models",
+    "sections": [
+     {
+      "heading": "Sentiment Analysis",
+      "text": "Classifies text as positive, negative or neutral."
+     },
+     {
+      "heading": "Named Entity Recognition",
+      "text": "Finds and labels names of people, places and organisations in text."
+     },
+     {
+      "heading": "Language Models",
+      "text": "Transformer based models such as BERT and GPT learn language from huge text collections and can be adapted to many tasks."
+     },
+     {
+      "heading": "Example",
+      "text": "A review that says great battery life would be classified as positive."
+     }
+    ]
+   }
+  ]
+ },
+ "questions": {
+  "Python Programming": [
+   [
+    "What is Python?",
+    "A high-level, interpreted programming language with readable syntax, widely used in data science and AI.",
+    0
+   ],
+   [
+    "What is a function in Python?",
+    "A reusable block of code defined with def that can take inputs and return a value.",
+    1
+   ],
+   [
+    "Name two Python libraries for data analysis.",
+    "NumPy for numerical arrays and pandas for tabular data.",
+    2
+   ]
+  ],
+  "Mathematics for ML": [
+   [
+    "What is a vector?",
+    "An ordered list of numbers that can represent a point or a direction in space.",
+    0
+   ],
+   [
+    "What does the gradient show?",
+    "The direction of steepest increase of a function. It is the vector of partial derivatives.",
+    2
+   ],
+   [
+    "State Bayes’ theorem.",
+    "P(A|B) = P(B|A) × P(A) / P(B).",
+    1
+   ]
+  ],
+  "Machine Learning": [
+   [
+    "What is machine learning?",
+    "A field where computers learn patterns from data to make predictions or decisions without being given explicit rules.",
+    0
+   ],
+   [
+    "What is overfitting?",
+    "When a model learns the training data too closely, including noise, and performs poorly on new data.",
+    1
+   ],
+   [
+    "Differentiate supervised and unsupervised learning.",
+    "Supervised learning uses labelled data. Unsupervised learning finds patterns in unlabelled data.",
+    0
+   ]
+  ],
+  "Deep Learning": [
+   [
+    "What is an activation function?",
+    "A function that adds non-linearity to a neuron’s output, such as ReLU, sigmoid or tanh.",
+    0
+   ],
+   [
+    "What is backpropagation?",
+    "An algorithm that computes the gradients of the loss with respect to the weights by applying the chain rule backwards through the network.",
+    1
+   ],
+   [
+    "What are CNNs mainly used for?",
+    "Processing grid-like data such as images.",
+    2
+   ]
+  ],
+  "Natural Language Processing (NLP)": [
+   [
+    "What is tokenization?",
+    "Splitting text into smaller units such as words or subwords.",
+    0
+   ],
+   [
+    "What does TF-IDF measure?",
+    "How important a word is to a document relative to a collection of documents.",
+    1
+   ],
+   [
+    "Give two NLP tasks.",
+    "Sentiment analysis and named entity recognition.",
+    2
+   ]
+  ]
+ }
+}

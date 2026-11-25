@@ -1,0 +1,22 @@
+/* Delete-my-account box. Uses currentColor so it reads on the light app and the dark consent page. Prefix pc-. */
+.pc-box { border: 1.5px solid color-mix(in srgb, currentColor 22%, transparent); border-radius: 14px; }
+.pc-summary { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 16px; cursor: pointer; list-style: none; font-weight: 600; }
+.pc-summary::-webkit-details-marker { display: none; }
+.pc-summary::after { content: "+"; font-size: 20px; opacity: 0.6; }
+.pc-box[open] .pc-summary::after { content: "–"; }
+.pc-body { display: flex; flex-direction: column; gap: 8px; padding: 0 16px 16px; font-size: 15px; line-height: 1.55; }
+.pc-body p { margin: 0; opacity: 0.8; }
+.pc-label { margin-top: 8px; font-weight: 500; }
+.pc-input {
+  min-height: 48px; padding: 0 16px; border-radius: 12px; border: 1.5px solid color-mix(in srgb, currentColor 30%, transparent);
+  background: transparent; color: inherit; font: inherit; font-size: 16px; font-family: var(--font-jetbrains), monospace; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.pc-input:focus { outline: none; border-color: currentColor; }
+.pc-msg { min-height: 0; color: #d0342c; opacity: 1 !important; }
+.pc-msg:empty { display: none; }
+.pc-danger {
+  align-self: flex-start; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 0; background: #b42318; color: #fff;
+  font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: scale 120ms var(--ease-out);
+}
+.pc-danger:active { scale: 0.97; }
+.pc-danger:disabled { opacity: 0.6; cursor: progress; }

@@ -1,0 +1,12 @@
+# Never commit secrets or local-only state
+.env
+.env.*
+!.env.example
+*.local.md
+*.local.json
+node_modules/
+.DS_Store
+
+# Tool working folders (browser profiles with logins, caches)
+.taste-skill/
+.gstack/

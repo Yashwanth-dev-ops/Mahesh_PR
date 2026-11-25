@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/* Design tokens: Figma "Color" collection (Light / Dark) + "Size" collection. */
+:root {
+  --bg: #f5f3ef;
+  --surface: #eae7e0;
+  --card: #ffffff;
+  --ink: #08090b;
+  --ink-muted: #5a5750;
+  --border: #dedad2;
+  --primary: #08090b;
+  --primary-ink: #f5f3ef;
+  --primary-soft: #fff0b3;
+  --accent: #ffc900;
+  --success: #1f7a4d;
+  --warning: #9a5800;
+  --danger: #b42318;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  --bg: #08090b;
+  --surface: #1c1d21;
+  --card: #141518;
+  --ink: #f5f3ef;
+  --ink-muted: #a8a49c;
+  --border: #2b2c30;
+  --primary: #ffc900;
+  --primary-ink: #08090b;
+  --primary-soft: #332900;
+  --success: #5cc08c;
+  --warning: #e3a24a;
+  --danger: #f07a6e;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-schibsted);
+  --font-mono: var(--font-jetbrains);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent; /* each control draws its own press state */
+  scrollbar-width: none; /* scrolling still works with wheel, touch and keys */
+}
+html::-webkit-scrollbar { display: none; }
+/* Dark pages: whatever shows past their edge is dark too. */
+html:has(.lp-page, .au-page) { background: #08090b; }
+
+body {
+  font-family: var(--font-schibsted), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
