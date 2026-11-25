@@ -1,0 +1,8 @@
+# Never upload local-only or sensitive files to Vercel
+backups
+*.local.md
+.env*
+.gstack
+.impeccable
+motion-audits
+supabase/.temp
