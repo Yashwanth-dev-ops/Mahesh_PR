@@ -6,9 +6,10 @@ import { readSignup, rollError, validateSignup, hasErrors, type SignupErrors } f
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
 import { PRIVACY_VERSION } from "@/lib/site";
+import { audit } from "@/server/audit";
 
 export type SignupResult = { errors?: SignupErrors; message?: string; ok?: true; status?: "active" | "pending" };
-export type LoginResult = { errors?: { roll?: string; password?: string }; message?: string; ok?: true; to?: string; name?: string; roll?: string };
+export type LoginResult = { errors?: { roll?: string; email?: string; password?: string }; message?: string; ok?: true; to?: string; name?: string; roll?: string };
 export type FormResult = { errors?: Record<string, string | undefined>; message?: string; ok?: true };
 
 const WRONG = "Roll number or password is wrong.";
@@ -89,7 +90,7 @@ export async function signUpStudent(form: FormData): Promise<SignupResult> {
     password: s.password,
     options: {
       emailRedirectTo: `${origin}/auth/confirm`,
-      data: { full_name: s.fullName, roll_no: s.roll, year: String(s.year), section: s.section },
+      data: { full_name: s.fullName, roll_no: s.roll, year: String(s.year), section: s.section, phone: s.phone },
     },
   });
   if (error) {
@@ -115,7 +116,6 @@ export async function signUpStudent(form: FormData): Promise<SignupResult> {
 /** API.md signIn / adminSignIn: roll number + password. Same error for unknown roll and wrong password.
  *  A hidden `as=admin` field (admin login page) also requires role = admin. */
 export async function signIn(form: FormData): Promise<LoginResult> {
-  const asAdmin = form.get("as") === "admin";
   const roll = String(form.get("roll") ?? "").trim().toUpperCase();
   const password = String(form.get("password") ?? "");
   const errors = { roll: rollError(roll), password: password ? undefined : "Enter your password." };
@@ -142,21 +142,62 @@ export async function signIn(form: FormData): Promise<LoginResult> {
     await supabase.auth.signOut();
     return { message: STATUS_MESSAGE[profile?.status === "suspended" ? "suspended" : "pending"] };
   }
-  if (asAdmin && profile.role !== "admin") {
+  if (profile.role === "admin") { // admins sign in with their email at the admin login
     await supabase.auth.signOut();
-    return { message: "This account has no admin access." }; // UX_FLOWS Flow 2: no hint about who the admins are
+    return { message: "This is an admin account. Sign in at the admin login." };
   }
-  return { ok: true, to: asAdmin ? "/admin" : "/home", name: profile.full_name.split(" ")[0], roll: profile.roll_no };
+  return { ok: true, to: "/home", name: profile.full_name.split(" ")[0], roll: profile.roll_no };
+}
+
+/** Admin login: email + password, admin accounts only. Same limits as student sign-in; every attempt is audited. */
+export async function signInAdmin(form: FormData): Promise<LoginResult> {
+  const email = String(form.get("email") ?? "").trim().toLowerCase();
+  const password = String(form.get("password") ?? "");
+  const errors = { email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? undefined : "Enter your admin email.", password: password ? undefined : "Enter your password." };
+  if (hasErrors(errors)) return { errors };
+  const ip = await clientIp();
+  if (await networkBlocked(ip)) return { message: tooMany(IP_FAILS.minutes * 60) };
+  const limited = await overLimit("login", email);
+  if (limited) return { message: limited };
+  const db = supabaseAdmin(), nope = "Email or password is wrong.";
+  const supabase = await supabaseServer();
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { await recordFailure(ip); await audit(db, { id: null, label: "—" }, "Failed admin sign-in", email, "wrong email or password"); return { message: nope }; }
+  const { data: profile } = await db.from("profiles").select("status, role, full_name").eq("id", data.user.id).single();
+  if (profile?.role !== "admin" || profile.status !== "active") {
+    await supabase.auth.signOut();
+    await audit(db, { id: data.user.id, label: profile?.full_name ?? "—" }, "Failed admin sign-in", email, "not an admin account");
+    return { message: "This account has no admin access." }; // no hint about who the admins are
+  }
+  await db.rpc("rate_clear", { p_key: `login:${email}` });
+  await audit(db, { id: data.user.id, label: profile.full_name }, "Signed in", "admin login", `network ${ip.replace(/\.\d+\.\d+$/, ".x.x")}`);
+  return { ok: true, to: "/admin", name: profile.full_name.split(" ")[0], roll: email };
+}
+
+/** The email back if it belongs to an admin account, else null (same answer to the user either way). */
+async function adminAccountEmail(email: string) {
+  const db = supabaseAdmin();
+  const { data } = await db.from("admin_invites").select("user_id").eq("email", email).maybeSingle();
+  const { data: owner } = await db.from("profiles").select("id").eq("is_owner", true).maybeSingle();
+  for (const id of [data?.user_id, owner?.id]) {
+    if (!id) continue;
+    const { data: u } = await db.auth.admin.getUserById(id);
+    if (u.user?.email?.toLowerCase() === email) return email;
+  }
+  return null;
 }
 
 /** Forgot password: same answer whether or not the roll number exists. */
 export async function requestPasswordReset(form: FormData): Promise<FormResult> {
+  // Admins have no roll number: their form sends their email instead (only admin accounts get a link that way).
+  const adminEmail = form.has("email") ? String(form.get("email") ?? "").trim().toLowerCase() : null;
   const roll = String(form.get("roll") ?? "").trim().toUpperCase();
-  const err = rollError(roll);
+  if (adminEmail !== null && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) return { errors: { email: "Enter your admin email." } };
+  const err = adminEmail === null ? rollError(roll) : undefined;
   if (err) return { errors: { roll: err } };
-  const limited = await overLimit("reset", roll);
+  const limited = await overLimit("reset", adminEmail ?? roll);
   if (limited) return { message: limited };
-  const { data: email } = await supabaseAdmin().rpc("email_for_roll", { p_roll: roll });
+  const email = adminEmail !== null ? await adminAccountEmail(adminEmail) : (await supabaseAdmin().rpc("email_for_roll", { p_roll: roll })).data;
   if (email) {
     const supabase = await supabaseServer();
     // Supabase limits how often reset emails go out; a rate-limit error is hidden behind the same answer.
@@ -218,7 +259,7 @@ export async function completeProfile(form: FormData): Promise<FormResult & { st
 
   const { data: status } = await admin.rpc("roster_status", { p_roll: s.roll, p_name: s.fullName });
   const { error } = await admin.from("profiles").insert({
-    id: user.id, full_name: s.fullName, roll_no: s.roll, year: s.year, section: s.section, status: status ?? "pending",
+    id: user.id, full_name: s.fullName, roll_no: s.roll, year: s.year, section: s.section, phone: s.phone, status: status ?? "pending",
     privacy_version: PRIVACY_VERSION, privacy_accepted_at: new Date().toISOString(),
   });
   if (error) return { message: "We couldn't save your profile. Try again." };

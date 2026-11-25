@@ -3,16 +3,16 @@ import { supabaseServer } from "@/lib/supabase/server";
 
 // Reads for the student pages. Every query runs as the signed-in user, so RLS decides what they can see.
 
-export type Me = { id: string; fullName: string; firstName: string; rollNo: string; year: number | null; section: string | null; role: "student" | "admin"; avatarUrl: string | null };
+export type Me = { id: string; fullName: string; firstName: string; rollNo: string; year: number | null; section: string | null; role: "student" | "admin"; avatarUrl: string | null; phone: string | null };
 
 export async function getMe(): Promise<Me | null> {
   const supabase = await supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
-  const { data: p } = await supabase.from("profiles").select("full_name, roll_no, year, section, role, status, avatar_path").eq("id", user.id).maybeSingle();
+  const { data: p } = await supabase.from("profiles").select("full_name, roll_no, year, section, role, status, avatar_path, phone").eq("id", user.id).maybeSingle();
   if (!p || p.status !== "active") return null;
   return {
-    id: user.id, fullName: p.full_name, firstName: p.full_name.split(" ")[0], rollNo: p.roll_no, year: p.year, section: p.section, role: p.role,
+    id: user.id, fullName: p.full_name, firstName: p.full_name.split(" ")[0], rollNo: p.roll_no, year: p.year, section: p.section, role: p.role, phone: p.phone,
     avatarUrl: p.avatar_path ? supabase.storage.from("avatars").getPublicUrl(p.avatar_path).data.publicUrl : null,
   };
 }

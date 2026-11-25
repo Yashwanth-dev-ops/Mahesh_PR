@@ -1,29 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { after } from "next/server";
 import { approvedEmail, sendMail } from "@/lib/email";
 import { parseCsv } from "@/lib/csv";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { supabaseServer } from "@/lib/supabase/server";
 import { ROLL } from "@/components/auth/rules";
+import { requireAdmin, siteOrigin } from "@/server/admin-auth";
+import { eraseAccount } from "@/server/accounts";
+import { audit } from "@/server/audit";
 
-/** Every admin action starts here: the caller must be a signed-in, active admin. */
-async function requireAdmin() {
-  const supabase = await supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("not signed in");
-  const { data: p } = await supabase.from("profiles").select("role, status").eq("id", user.id).maybeSingle();
-  if (p?.role !== "admin" || p.status !== "active") throw new Error("not an admin");
-  return { adminId: user.id, db: supabaseAdmin() };
-}
 const fail = (message: string) => ({ ok: false as const, message });
 
 /** Emails "Your account is approved" after the response is sent; a mail failure never undoes the approval. */
 async function notifyApproved(db: ReturnType<typeof supabaseAdmin>, ids: string[]) {
   if (!ids.length) return;
-  const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const origin = await siteOrigin();
   after(async () => {
     const { data: people } = await db.from("profiles").select("id, full_name").in("id", ids);
     for (const p of people ?? []) {
@@ -37,14 +29,38 @@ async function notifyApproved(db: ReturnType<typeof supabaseAdmin>, ids: string[
   });
 }
 
-/** Approve (active) or reject (suspended, can't sign in; reversible) a pending student. */
-export async function setStudentStatus(profileId: string, status: "active" | "suspended") {
-  const { db } = await requireAdmin().catch(() => ({ db: null }));
-  if (!db) return fail("Only admins can do this.");
-  const { error } = await db.from("profiles").update({ status }).eq("id", profileId).eq("role", "student");
-  if (!error && status === "active") await notifyApproved(db, [profileId]);
-  revalidatePath("/admin");
-  return error ? fail("Couldn't update. Try again.") : { ok: true as const, message: status === "active" ? "Approved" : "Rejected" };
+const who = (p: { full_name: string; roll_no: string }) => `${p.full_name} · ${p.roll_no}`;
+
+/**
+ * Change a student's access. active = approve a waiting student or give a blocked one access again; suspended =
+ * reject a waiting student or block an active one (can't sign in; reversible). The reason is shown to admins only.
+ */
+export async function setStudentStatus(profileId: string, status: "active" | "suspended", reason?: string) {
+  const auth = await requireAdmin().catch(() => null);
+  if (!auth) return fail("Only admins can do this.");
+  const why = (reason ?? "").trim().slice(0, 200) || null;
+  const { data: before } = await auth.db.from("profiles").select("full_name, roll_no, status").eq("id", profileId).eq("role", "student").maybeSingle();
+  if (!before) return fail("That student no longer exists.");
+  const { error } = await auth.db.from("profiles").update({ status, status_reason: status === "suspended" ? why : null }).eq("id", profileId).eq("role", "student");
+  if (error) return fail("Couldn't update. Try again.");
+  const action = status === "active" ? (before.status === "pending" ? "Approved a student" : "Gave access") : (before.status === "pending" ? "Rejected a student" : "Blocked a student");
+  await audit(auth.db, auth.actor, action, who(before), status === "suspended" && why ? `reason: ${why}` : before.status === "suspended" ? "was blocked" : null);
+  if (status === "active") await notifyApproved(auth.db, [profileId]);
+  revalidatePath("/admin", "layout");
+  return { ok: true as const, message: status === "active" ? (before.status === "pending" ? "Approved" : "Access given") : (before.status === "pending" ? "Rejected" : "Blocked") };
+}
+
+/** Permanently delete a student's account and data. The admin types the roll number to confirm. */
+export async function deleteStudent(profileId: string, typedRoll: string) {
+  const auth = await requireAdmin().catch(() => null);
+  if (!auth) return fail("Only admins can do this.");
+  const { data: p } = await auth.db.from("profiles").select("full_name, roll_no").eq("id", profileId).eq("role", "student").maybeSingle();
+  if (!p) return fail("That student no longer exists.");
+  if (typedRoll.trim().toUpperCase() !== p.roll_no) return fail(`Type ${p.roll_no} exactly to confirm.`);
+  if (!(await eraseAccount(auth.db, profileId, p.roll_no))) return fail("Couldn't delete. Try again.");
+  await audit(auth.db, auth.actor, "Deleted an account", who(p), "roll number typed to confirm");
+  revalidatePath("/admin", "layout");
+  return { ok: true as const, message: "Deleted" };
 }
 
 export type RosterResult = { ok: boolean; message: string; imported?: number; activated?: number; errors?: string[] };
@@ -81,8 +97,9 @@ export async function importRoster(form: FormData): Promise<RosterResult> {
     if (st === "active") { const { error: e } = await auth.db.from("profiles").update({ status: "active" }).eq("id", p.id); if (!e) approved.push(p.id); }
   }
   const activated = approved.length;
+  await audit(auth.db, auth.actor, "Imported the class list", `${good.length} rows`, `${errors.length} skipped, ${activated} waiting students approved`);
   await notifyApproved(auth.db, approved);
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true, message: `Imported ${good.length} ${good.length === 1 ? "student" : "students"}${errors.length ? `, skipped ${errors.length} rows` : ""}. ${activated} pending ${activated === 1 ? "account was" : "accounts were"} approved.`, imported: good.length, activated, errors: errors.slice(0, 20) };
 }
 
@@ -100,14 +117,17 @@ export async function postNotice(form: FormData) {
   const expires = until ? new Date(`${until}T23:59:59+05:30`) : null; // end of that day, India time
   if (expires && (isNaN(+expires) || expires <= new Date())) return fail("The end date must be in the future.");
   const { error } = await auth.db.from("notices").insert({ title, body, category, pinned: form.get("pinned") === "on", expires_at: expires?.toISOString() ?? null, created_by: auth.adminId });
-  revalidatePath("/admin"); revalidatePath("/home"); revalidatePath("/notices");
+  if (!error) await audit(auth.db, auth.actor, "Posted a notice", `“${title}”`, `category: ${category}`);
+  revalidatePath("/admin", "layout"); revalidatePath("/home"); revalidatePath("/notices");
   return error ? fail("Couldn't post. Try again.") : { ok: true as const, message: "Posted. Students see it now." };
 }
 
 export async function deleteNotice(id: string) {
   const auth = await requireAdmin().catch(() => null);
   if (!auth) return fail("Only admins can do this.");
+  const { data: n } = await auth.db.from("notices").select("title").eq("id", id).maybeSingle();
   const { error } = await auth.db.from("notices").delete().eq("id", id);
-  revalidatePath("/admin"); revalidatePath("/home"); revalidatePath("/notices");
+  if (!error && n) await audit(auth.db, auth.actor, "Deleted a notice", `“${n.title}”`);
+  revalidatePath("/admin", "layout"); revalidatePath("/home"); revalidatePath("/notices");
   return error ? fail("Couldn't delete.") : { ok: true as const, message: "Deleted" };
 }

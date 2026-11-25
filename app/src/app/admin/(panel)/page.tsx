@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { signOut } from "@/app/actions/auth";
 import { NoticeDelete, NoticeForm, PendingRow, RosterForm } from "@/components/admin/AdminForms";
 import { getDashboard } from "@/server/admin";
 import { APP_NAME } from "@/lib/site";
-import "@/components/admin/admin.css";
 
 export const metadata: Metadata = { title: `Admin · ${APP_NAME}` };
 const day = (iso: string) => new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" }).format(new Date(iso));
@@ -100,18 +98,5 @@ async function Dashboard() {
 }
 
 export default function AdminPage() {
-  return (
-    <div className="ad-shell">
-      <nav className="ad-side" aria-label="Admin">
-        <p className="ad-brand"><span className="ad-mark" aria-hidden="true">A</span><span>{APP_NAME}<span className="ad-tag">ADMIN</span></span></p>
-        <ul>
-          {[["#dashboard", "Dashboard"], ["#students", "Students"], ["#notices", "Notices"], ["#feedback", "Feedback"], ["#content", "Content"]].map(([h, l]) => <li key={h}><a href={h}>{l}</a></li>)}
-        </ul>
-        <form action={signOut}><button className="ad-sideOut">Sign out</button></form>
-      </nav>
-      <main className="ad-main">
-        <Suspense fallback={<p className="ad-meta">Loading dashboard…</p>}><Dashboard /></Suspense>
-      </main>
-    </div>
-  );
+  return <Suspense fallback={<p className="ad-meta">Loading dashboard…</p>}><Dashboard /></Suspense>;
 }

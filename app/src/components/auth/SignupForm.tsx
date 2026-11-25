@@ -11,7 +11,7 @@ import { setAuthError, setAuthHead, type Head } from "./AuthHead";
 import { AUTH_FORM_ID, SIGNUP_STEP1, YEARS, hasErrors, readSignup, validateSignup, type SignupErrors, type SignupKey } from "./rules";
 
 const STEP2: Head = { kicker: "Step 2 of 2", title: "A few more details" };
-const STEP1_KEYS: SignupKey[] = ["fullName", "roll"];
+const STEP1_KEYS: SignupKey[] = ["fullName", "roll", "phone"];
 
 /**
  * Sign-up form. Two steps so neither scrolls on a phone: name + roll number first (they decide instant access),
@@ -117,6 +117,10 @@ export function SignupForm({ googleName }: { googleName?: string } = {}) {
         <Field
           name="roll" label="Roll number" error={errors.roll} onEdit={clear("roll")}
           inputProps={{ autoComplete: "username", autoCapitalize: "characters", spellCheck: false, maxLength: 15, placeholder: "e.g. 22AB1A4201" }}
+        />
+        <Field
+          name="phone" type="tel" label="Mobile number" hint="Only admins see it" error={errors.phone} onEdit={clear("phone")}
+          inputProps={{ autoComplete: "tel-national", inputMode: "tel", maxLength: 16, placeholder: "10-digit number" }}
         />
         {google && yearSection}
         {google && photo}

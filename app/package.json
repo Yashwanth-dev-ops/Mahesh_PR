@@ -10,7 +10,8 @@
     "backup": "node --env-file=.env.local scripts/backup.mjs",
     "restore": "node --env-file=.env.local scripts/restore.mjs",
     "setup-email": "node --env-file=.env.local scripts/setup-email.mjs",
-    "backup-drive": "scripts/backup-to-drive.sh"
+    "backup-drive": "scripts/backup-to-drive.sh",
+    "setup-owner": "node --env-file=.env.local scripts/setup-owner.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

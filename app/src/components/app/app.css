@@ -171,6 +171,14 @@ a.ap-card:active { scale: 0.98; } /* touch has no hover: show the press while th
 }
 .ap-note textarea:focus { outline: none; border-color: var(--ink); }
 .ap-note .ap-meta { min-height: 1.4em; }
+.ap-input {
+  width: 100%; min-height: 48px; padding: 0 14px; border: 1.5px solid var(--border); border-radius: 12px;
+  background: var(--bg); font: inherit; font-size: 16px; color: var(--ink);
+}
+.ap-input:focus { outline: none; border-color: var(--ink); }
+.ap-phoneRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ap-phoneRow .ap-mono { font-family: var(--font-mono), ui-monospace, monospace; font-size: 17px; letter-spacing: 0.02em; }
+.ap-phoneRow .ap-btnLine { padding: 0 16px; }
 
 /* search */
 .ap-result { flex-direction: column; align-items: flex-start; gap: 4px; }

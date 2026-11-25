@@ -8,11 +8,13 @@ export const metadata: Metadata = { title: `Privacy · ${APP_NAME}`, description
 const DATA = [
   ["Your name and roll number", "To sign you in and check you against the class list from the college."],
   ["Your email", "For account messages: password resets and “your account is approved”."],
+  ["Your mobile number", "So library admins can reach you about your account or a class notice. Only admins see it; we never send ads or share it."],
   ["Your year and section", "To show you the right subjects and notices."],
   ["Your photo", "For your library card inside the app."],
   ["What you study", "Chapters you finish, the page you stopped at, questions you mark “I know this”, and your notes. Only to show your progress and bring you back where you left off."],
   ["Feedback you send", "To fix problems and improve the app."],
   ["Sign-in attempts", "To stop password guessing. Kept for one day."],
+  ["What admins do to your account", "Approving, blocking or deleting an account is written to an admin-only log, so every change can be checked. Kept for one year."],
 ];
 
 /** Privacy notice (DPDP Act 2023). Plain language, one page, versioned: students agree to PRIVACY_VERSION. */
@@ -42,7 +44,7 @@ export default function PrivacyPage() {
           <h2>Who can see it</h2>
           <ul>
             <li><strong>You</strong> see everything about yourself.</li>
-            <li><strong>Library admins</strong> see your name, roll number, year, section and whether your account is approved, so they can approve sign-ups. They don&apos;t read your notes.</li>
+            <li><strong>Library admins</strong> see your name, roll number, year, section, email, mobile number and whether your account is approved, so they can approve sign-ups and reach you. They don&apos;t read your notes.</li>
             <li><strong>Other students</strong> see nothing of yours.</li>
           </ul>
 

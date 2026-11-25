@@ -31,24 +31,29 @@ function useAction(action: (d: FormData) => Promise<FormResult>, onOk: () => voi
   return { errors, busy, onSubmit, clear };
 }
 
-export function ForgotForm() {
+export function ForgotForm({ admin = false }: { admin?: boolean } = {}) {
   const [sent, setSent] = useState(false);
   const f = useAction(requestPasswordReset, () => setSent(true));
   if (sent) {
     return (
       <div className="au-done" role="status">
         <p className="au-doneTitle">Check your email</p>
-        <p>If that roll number has an account, we&apos;ve sent a reset link to the email on it. The link works for one hour.</p>
-        <Link href="/login" className="au-small">Back to log in</Link>
+        <p>{admin ? "If that email belongs to an admin account, we've sent a reset link to it." : "If that roll number has an account, we've sent a reset link to the email on it."} The link works for 24 hours.</p>
+        <Link href={admin ? "/admin/login" : "/login"} className="au-small">Back to log in</Link>
       </div>
     );
   }
   return (
     <form id={AUTH_FORM_ID} className="au-form" noValidate onSubmit={f.onSubmit}>
-      <Field
-        name="roll" label="Roll number" error={f.errors.roll} onEdit={f.clear("roll")}
-        inputProps={{ autoComplete: "username", autoCapitalize: "characters", spellCheck: false, maxLength: 15, placeholder: "e.g. 22AB1A4201" }}
-      />
+      {admin ? (
+        <Field name="email" type="email" label="Admin email" error={f.errors.email} onEdit={f.clear("email")}
+          inputProps={{ autoComplete: "username", spellCheck: false, maxLength: 120, placeholder: "you@college.edu" }} />
+      ) : (
+        <Field
+          name="roll" label="Roll number" error={f.errors.roll} onEdit={f.clear("roll")}
+          inputProps={{ autoComplete: "username", autoCapitalize: "characters", spellCheck: false, maxLength: 15, placeholder: "e.g. 22AB1A4201" }}
+        />
+      )}
       <div className="au-actions"><PillButton>{f.busy ? "Sending…" : "Send reset link"}</PillButton></div>
     </form>
   );

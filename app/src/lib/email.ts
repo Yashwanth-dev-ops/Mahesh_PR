@@ -42,3 +42,19 @@ export function approvedEmail(firstName: string, loginUrl: string) {
   const html = emailFrame("You're in", `Hi ${esc(firstName)}, an admin approved your account. Sign in with your roll number and password.`, { label: "Sign in", url: loginUrl });
   return { subject, text, html };
 }
+
+/** Bulk registration: an admin made the account; the student sets their own password from this link. */
+export function welcomeEmail(firstName: string, url: string) {
+  const subject = `Your ${APP_NAME} account is ready`;
+  const text = `Hi ${firstName},\n\nYour library admin made you an account. Choose your password here (the link works once, for 24 hours):\n${url}\n\nAfter that, sign in with your roll number and that password. If the link has expired, use "Forgot password" on the login page.\n\n${APP_NAME}`;
+  const html = emailFrame("Your account is ready", `Hi ${esc(firstName)}, your library admin made you an account. Choose your password to start. The link works once, for 24 hours; after that use “Forgot password” on the login page.`, { label: "Choose my password", url });
+  return { subject, text, html };
+}
+
+/** Admin invitation from the main admin. */
+export function adminInviteEmail(name: string, inviter: string, url: string) {
+  const subject = `You're invited to be a ${APP_NAME} admin`;
+  const text = `Hi ${name},\n\n${inviter} invited you to help run ${APP_NAME} as an admin. Set your password here (the link works once, for 24 hours):\n${url}\n\nThen sign in at the admin login with this email address.\n\n${APP_NAME}`;
+  const html = emailFrame("You're invited to be an admin", `Hi ${esc(name)}, ${esc(inviter)} invited you to help run ${esc(APP_NAME)}. Set your password to finish; the link works once, for 24 hours. Then sign in at the admin login with this email address.`, { label: "Set my password", url });
+  return { subject, text, html };
+}

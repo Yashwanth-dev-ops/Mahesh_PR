@@ -2,8 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { PRIVACY_VERSION } from "@/lib/site";
+import { normPhone, phoneError } from "@/components/auth/rules";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
+import { eraseAccount } from "@/server/accounts";
 
 /** DPDP Act: an existing account agrees to the current privacy notice (shown once at /consent). */
 export async function acceptPrivacy(form: FormData) {
@@ -11,8 +13,15 @@ export async function acceptPrivacy(form: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   if (form.get("consent") !== "yes") redirect("/consent?missing=1");
-  const { data: me } = await supabaseAdmin().from("profiles")
-    .update({ privacy_version: PRIVACY_VERSION, privacy_accepted_at: new Date().toISOString() }).eq("id", user.id).select("role").single();
+  const db = supabaseAdmin();
+  const { data: cur } = await db.from("profiles").select("role, phone").eq("id", user.id).single();
+  const update: { privacy_version: string; privacy_accepted_at: string; phone?: string } = { privacy_version: PRIVACY_VERSION, privacy_accepted_at: new Date().toISOString() };
+  if (cur?.role !== "admin" && !cur?.phone) { // students made before sign-up asked for it
+    const phone = normPhone(String(form.get("phone") ?? ""));
+    if (phoneError(phone)) redirect("/consent?phone=bad");
+    update.phone = phone;
+  }
+  const { data: me } = await db.from("profiles").update(update).eq("id", user.id).select("role").single();
   redirect(me?.role === "admin" ? "/admin" : "/home");
 }
 
@@ -34,12 +43,7 @@ export async function deleteMyAccount(form: FormData): Promise<DeleteResult> {
   const typed = String(form.get("confirm") ?? "").trim().toUpperCase();
   if (!me || typed !== me.roll_no) return { message: "Type your roll number exactly to confirm." };
 
-  await admin.from("feedback").delete().eq("user_id", user.id);
-  const { data: files } = await admin.storage.from("avatars").list(user.id);
-  if (files?.length) await admin.storage.from("avatars").remove(files.map((f) => `${user.id}/${f.name}`));
-  await admin.from("rate_events").delete().like("key", `%:${me.roll_no}`);
-  const { error } = await admin.auth.admin.deleteUser(user.id);
-  if (error) return { message: "We couldn't delete your account. Try again, or write to the contact on the privacy page." };
+  if (!(await eraseAccount(admin, user.id, me.roll_no))) return { message: "We couldn't delete your account. Try again, or write to the contact on the privacy page." };
   await supabase.auth.signOut();
   return { ok: true };
 }

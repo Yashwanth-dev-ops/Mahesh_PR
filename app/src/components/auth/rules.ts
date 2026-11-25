@@ -9,12 +9,22 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const PHOTO_MAX = 2 * 1024 * 1024;
 
+/** A 10-digit Indian mobile. Accepts spaces, dashes, +91 or a leading 0, and keeps only the 10 digits. */
+export function normPhone(raw: string) {
+  const d = raw.replace(/\D/g, "");
+  return d.length === 12 && d.startsWith("91") ? d.slice(2) : d.length === 11 && d.startsWith("0") ? d.slice(1) : d;
+}
+export function phoneError(phone: string) {
+  if (!phone) return "Enter your mobile number.";
+  if (!/^[6-9][0-9]{9}$/.test(phone)) return "Enter a 10-digit mobile number.";
+}
+
 export function rollError(roll: string) {
   if (!roll) return "Enter your roll number.";
   if (!ROLL.test(roll)) return "Roll numbers use only letters and digits, 6 to 15 characters.";
 }
 
-export type SignupKey = "fullName" | "photo" | "roll" | "email" | "year" | "section" | "password" | "consent";
+export type SignupKey = "fullName" | "photo" | "roll" | "phone" | "email" | "year" | "section" | "password" | "consent";
 export type SignupErrors = Partial<Record<SignupKey, string>>;
 
 export function readSignup(d: FormData) {
@@ -23,6 +33,7 @@ export function readSignup(d: FormData) {
   return {
     fullName: v("fullName"),
     roll: v("roll").toUpperCase(),
+    phone: normPhone(v("phone")),
     email: v("email").toLowerCase(),
     year: YEARS.indexOf(v("year")) + 1, // 0 = not chosen
     section: v("section").toUpperCase(),
@@ -39,6 +50,7 @@ export function validateSignup(s: ReturnType<typeof readSignup>): SignupErrors {
       : s.photo.size > PHOTO_MAX ? "That photo is over 2 MB. Choose a smaller one." : undefined,
     fullName: s.fullName.length < 2 || s.fullName.length > 80 ? "Enter your full name." : undefined,
     roll: rollError(s.roll),
+    phone: phoneError(s.phone),
     email: !s.email ? "Enter your email." : !EMAIL.test(s.email) || s.email.length > 120 ? "Enter an email like name@example.com." : undefined,
     year: s.year ? undefined : "Choose one.",
     section: /^[A-Z0-9]{1,3}$/.test(s.section) ? undefined : "Enter it.",

@@ -9,7 +9,7 @@ export async function GET() {
   const db = supabaseAdmin();
   const mine = <T extends string>(table: T, cols = "*") => db.from(table).select(cols).eq("user_id", user.id);
   const [profile, progress, known, notes, feedback, photos] = await Promise.all([
-    db.from("profiles").select("full_name, roll_no, year, section, role, status, avatar_path, created_at, privacy_version, privacy_accepted_at").eq("id", user.id).maybeSingle(),
+    db.from("profiles").select("full_name, roll_no, year, section, phone, role, status, avatar_path, created_at, privacy_version, privacy_accepted_at").eq("id", user.id).maybeSingle(),
     mine("chapter_progress"),
     mine("known_questions"),
     mine("subject_notes"),

@@ -7,12 +7,12 @@ import { PillButton } from "@/components/ui/PillLinks";
 import { Field, PasswordField, focusFirstError } from "./fields";
 import { revealFail, revealOk, revealStart } from "./RevealHost";
 import { setAuthError } from "./AuthHead";
-import { signIn, type LoginResult } from "@/app/actions/auth";
+import { signIn, signInAdmin, type LoginResult } from "@/app/actions/auth";
 import { AUTH_FORM_ID, rollError } from "./rules";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-type Errors = { roll?: string; password?: string };
+type Errors = { roll?: string; email?: string; password?: string };
 
 /** `admin` = the admin login page: only admin accounts get in, and they land on /admin. */
 export function LoginForm({ admin = false }: { admin?: boolean } = {}) {
@@ -28,18 +28,19 @@ export function LoginForm({ admin = false }: { admin?: boolean } = {}) {
     const form = ev.currentTarget;
     const data = new FormData(form);
     const e: Errors = {
-      roll: rollError(String(data.get("roll") ?? "").trim().toUpperCase()),
+      ...(admin ? { email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.get("email") ?? "").trim()) ? undefined : "Enter your admin email." }
+        : { roll: rollError(String(data.get("roll") ?? "").trim().toUpperCase()) }),
       password: data.get("password") ? undefined : "Enter your password.",
     };
     setErrors(e);
     setAuthError("");
-    if (e.roll || e.password) return focusFirstError(form, e);
+    if (e.roll || e.email || e.password) return focusFirstError(form, e);
 
     setBusy(true);
     // Yellow grows from the button while the account is checked; it opens onto Home or shrinks back.
     revealStart(form.querySelector(".pill-disc"));
     const t0 = Date.now(), still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const res = await signIn(data).catch(() => ({ message: "Something went wrong. Try again." }) as LoginResult);
+    const res = await (admin ? signInAdmin : signIn)(data).catch(() => ({ message: "Something went wrong. Try again." }) as LoginResult);
     if (res.ok) {
       const to = res.to ?? "/home";
       router.prefetch(to); // its code downloads while the flood plays
@@ -61,14 +62,18 @@ export function LoginForm({ admin = false }: { admin?: boolean } = {}) {
 
   return (
     <form id={AUTH_FORM_ID} className="au-form" noValidate onSubmit={onSubmit}>
-      {admin && <input type="hidden" name="as" value="admin" />}
-      <Field
-        name="roll" label="Roll number" error={errors.roll} onEdit={clear("roll")}
-        inputProps={{ autoComplete: "username", autoCapitalize: "characters", spellCheck: false, maxLength: 15, placeholder: "e.g. 22AB1A4201" }}
-      />
+      {admin ? (
+        <Field name="email" type="email" label="Email" error={errors.email} onEdit={clear("email")}
+          inputProps={{ autoComplete: "username", spellCheck: false, maxLength: 120, placeholder: "you@college.edu" }} />
+      ) : (
+        <Field
+          name="roll" label="Roll number" error={errors.roll} onEdit={clear("roll")}
+          inputProps={{ autoComplete: "username", autoCapitalize: "characters", spellCheck: false, maxLength: 15, placeholder: "e.g. 22AB1A4201" }}
+        />
+      )}
       <PasswordField
         name="password" label="Password" autoComplete="current-password" error={errors.password} onEdit={clear("password")}
-        aside={<Link href="/forgot-password" className="au-small">Forgot password?</Link>}
+        aside={<Link href={admin ? "/forgot-password?admin=1" : "/forgot-password"} className="au-small">Forgot password?</Link>}
       />
       <div className="au-actions"><PillButton>{busy ? "Signing in…" : "Sign in"}</PillButton></div>
     </form>

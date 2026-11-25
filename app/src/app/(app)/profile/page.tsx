@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { signOut } from "@/app/actions/auth";
 import Link from "next/link";
 import { FeedbackForm } from "@/components/app/FeedbackForm";
+import { PhoneForm } from "@/components/app/PhoneForm";
 import { DeleteAccount } from "@/components/privacy/DeleteAccount";
 import { getMe, getSubjects } from "@/server/learn";
 import { APP_NAME } from "@/lib/site";
@@ -31,6 +32,7 @@ async function Profile() {
         <div className="ap-card ap-stat"><dt className="ap-caption">Chapters done</dt><dd>{done} <span className="ap-meta">of {total}</span></dd></div>
         <div className="ap-card ap-stat"><dt className="ap-caption">Subjects</dt><dd>{subjects.length}</dd></div>
       </dl>
+      {me.role !== "admin" && <PhoneForm phone={me.phone} />}
       <FeedbackForm />
       <form action={signOut}><button className="ap-btnLine ap-wide">Sign out</button></form>
       <section className="ap-block" aria-labelledby="privacy-title">

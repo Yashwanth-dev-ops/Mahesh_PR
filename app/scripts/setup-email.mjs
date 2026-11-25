@@ -33,6 +33,7 @@ const res = await fetch(`https://api.supabase.com/v1/projects/${ref}/config/auth
   body: JSON.stringify({
     smtp_host: host, smtp_port: String(port), smtp_user: user, smtp_pass: pass, smtp_admin_email: user, smtp_sender_name: APP,
     rate_limit_email_sent: 60,
+    mailer_otp_exp: 86400, // set-password / reset links work for 24 hours (invites and bulk registration say so)
     mailer_subjects_recovery: `Reset your ${APP} password`,
     mailer_templates_recovery_content: readFileSync("supabase/templates/recovery.html", "utf8"),
   }),

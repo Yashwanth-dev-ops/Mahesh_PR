@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: `Admin login · ${APP_NAME}` };
 
 export default function AdminLoginPage() {
   return (
-    <AuthShell id="admin-login-title" title="Admin login" lead="For library admins only. Use your roll number and password.">
+    <AuthShell id="admin-login-title" title="Admin login" lead="For library admins only. Sign in with your admin email and password.">
       <LoginForm admin />
       <p className="au-alt">Not an admin? <Link href="/login">Student login</Link></p>
     </AuthShell>

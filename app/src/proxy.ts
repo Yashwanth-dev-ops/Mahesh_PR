@@ -49,8 +49,9 @@ export async function proxy(request: NextRequest) {
   }
   // DPDP Act: accounts that haven't agreed to the current privacy notice see /consent once before anything else.
   const agreed = p.privacy_version === PRIVACY_VERSION;
-  if (!agreed && !path.startsWith("/consent")) return go("/consent");
-  if (agreed && path.startsWith("/consent")) return go("/home");
+  // An invited admin agrees on /admin/setup itself, while choosing a password.
+  if (!agreed && !path.startsWith("/consent") && path !== "/admin/setup") return go("/consent");
+  if (agreed && path.startsWith("/consent")) return go(p.role === "admin" ? "/admin" : "/home");
   if (path.startsWith("/admin") && p.role !== "admin") return go("/home");
   if (path === "/login" || path === "/signup" || path.startsWith("/signup/complete")) return go("/home");
   return response;
