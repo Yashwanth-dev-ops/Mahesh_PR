@@ -5,8 +5,8 @@ import { deleteNotice, importRoster, postNotice, setStudentStatus, type RosterRe
 
 const FAILED = { ok: false, message: "Something went wrong. Try again." };
 
-/** One pending student with Approve / Reject. The row hides itself once decided. */
-export function PendingRow({ s }: { s: { id: string; name: string; roll: string; year: number | null; section: string | null; reason: string } }) {
+/** One pending student with Approve / Reject (or a rejected one with Give access). The row hides its buttons once decided. */
+export function PendingRow({ s, rejected }: { s: { id: string; name: string; roll: string; year: number | null; section: string | null; reason: string }; rejected?: boolean }) {
   const [state, setState] = useState<"" | "busy" | string>("");
   const act = async (status: "active" | "suspended") => {
     setState("busy");
@@ -22,8 +22,8 @@ export function PendingRow({ s }: { s: { id: string; name: string; roll: string;
       </div>
       {decided ? <span className={state === "Approved" ? "ad-ok" : "ad-meta"} role="status">{state}</span> : (
         <div className="ad-actions">
-          <button className="ad-btnLine" disabled={state === "busy"} onClick={() => act("suspended")}>Reject</button>
-          <button className="ad-btnInk" disabled={state === "busy"} onClick={() => act("active")}>Approve</button>
+          {!rejected && <button className="ad-btnLine" disabled={state === "busy"} onClick={() => act("suspended")}>Reject</button>}
+          <button className="ad-btnInk" disabled={state === "busy"} onClick={() => act("active")}>{rejected ? "Give access" : "Approve"}</button>
           {state && state !== "busy" && <span className="ad-err" role="status">{state}</span>}
         </div>
       )}

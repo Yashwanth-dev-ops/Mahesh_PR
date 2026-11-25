@@ -15,7 +15,7 @@ export async function getDashboard() {
 
   const db = supabaseAdmin();
   const since = new Date(Date.now() - WEEK).toISOString();
-  const [students, pending, active, feedback, newFeedback, notices, roster] = await Promise.all([
+  const [students, pending, active, feedback, newFeedback, notices, roster, rejected] = await Promise.all([
     db.from("profiles").select("id", { count: "exact", head: true }).eq("role", "student"),
     db.from("profiles").select("id, full_name, roll_no, year, section, created_at").eq("role", "student").eq("status", "pending").order("created_at"),
     db.from("chapter_progress").select("user_id").gte("updated_at", since).limit(10000),
@@ -23,6 +23,7 @@ export async function getDashboard() {
     db.from("feedback").select("id", { count: "exact", head: true }).gte("created_at", since),
     db.from("notices").select("id, title, body, category, pinned, publish_at, expires_at").order("publish_at", { ascending: false }).limit(10),
     db.from("student_roster").select("roll_no", { count: "exact", head: true }),
+    db.from("profiles").select("id, full_name, roll_no, year, section, updated_at").eq("role", "student").eq("status", "suspended").order("updated_at", { ascending: false }).limit(50),
   ]);
 
   // Why each account is pending: not on the list, name differs from the list, or Google sign-up.
@@ -49,6 +50,9 @@ export async function getDashboard() {
       roster: roster.count ?? 0,
     },
     waiting,
+    // Rejected students can't sign in; the admin can give them access after all.
+    rejected: (rejected.data ?? []).map((p) => ({ id: p.id, name: p.full_name, roll: p.roll_no, year: p.year, section: p.section,
+      reason: `rejected ${new Date(p.updated_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "Asia/Kolkata" })}, can't sign in` })),
     feedback: (feedback.data ?? []).map((f) => ({ id: f.id, message: f.message, page: f.page, at: f.created_at, name: (f.profiles as unknown as { full_name: string } | null)?.full_name ?? "Student" })),
     notices: (notices.data ?? []).map((n) => ({ ...n, live: new Date(n.publish_at) <= new Date() && (!n.expires_at || new Date(n.expires_at) > new Date()) })),
   };

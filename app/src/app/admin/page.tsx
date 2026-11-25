@@ -42,6 +42,10 @@ async function Dashboard() {
           <div className="ad-cardHead"><h2 id="w-h" className="ad-h2">Waiting for approval</h2></div>
           {d.waiting.length ? <ul className="ad-list">{d.waiting.map((s) => <PendingRow key={s.id} s={s} />)}</ul>
             : <p className="ad-empty">Nobody is waiting. New sign-ups that don&apos;t match the roster appear here.</p>}
+          {d.rejected.length > 0 && <>
+            <div className="ad-cardHead"><h3 className="ad-h2">Rejected</h3></div>
+            <ul className="ad-list">{d.rejected.map((s) => <PendingRow key={s.id} s={s} rejected />)}</ul>
+          </>}
         </section>
         <section className="ad-card" id="feedback" aria-labelledby="f-h">
           <div className="ad-cardHead"><h2 id="f-h" className="ad-h2">Latest feedback</h2></div>
