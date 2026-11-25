@@ -41,7 +41,7 @@ async function Audit({ searchParams }: { searchParams: Promise<Search> }) {
         <label className="ad-select"><span className="ad-sr">When</span>
           <select name="days" defaultValue={String(days)}><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="365">Last year</option></select></label>
         <label className="ad-search ad-searchSm"><span className="ad-sr">Search the target</span>
-          <input type="search" name="q" defaultValue={s.q ?? ""} placeholder="Search roll number, email or name, then Enter" /></label>
+          <input type="search" name="q" defaultValue={s.q ?? ""} placeholder="Roll no, email or name" /></label>
       </AuditFilters>
       <section className="ad-card ad-tableCard" aria-label="Audit log">
         {d.rows.length === 0 ? <p className="ad-empty">Nothing in the log for these filters.</p> : (

@@ -210,7 +210,11 @@
   .ad-students td:last-child { order: 0; margin-left: auto; }
   .ad-audit td:first-child { order: 0; flex: 0 0 auto; color: var(--ink); }
   .ad-audit td.ad-actionCell { order: 0; flex: 1 1 0; font-size: 14px; }
-  .ad-audit td.ad-actionCell:not(.ad-noteBad) { color: var(--ink); }
+  .ad-audit td.ad-actionCell { color: var(--ink); }
+  .ad-audit td.ad-actionCell.ad-noteBad { color: var(--danger); }
+  .ad-filters { display: grid; grid-template-columns: 1fr 1fr; }
+  .ad-filters .ad-search { grid-column: 1 / -1; }
+  .ad-filters .ad-select select { width: 100%; }
   .ad-audit td:last-child { order: 3; flex-basis: 100%; }
   .ad-table .ad-dayRow { display: block; padding: 0; border: 0; }
   .ad-table .ad-dayRow th { display: block; padding: 14px 0 6px; }
