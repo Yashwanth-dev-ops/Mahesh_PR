@@ -5,6 +5,7 @@ import { signOut } from "@/app/actions/auth";
 import Link from "next/link";
 import { FeedbackForm } from "@/components/app/FeedbackForm";
 import { PhoneForm } from "@/components/app/PhoneForm";
+import { ProfilePhoto } from "@/components/app/ProfilePhoto";
 import { DeleteAccount } from "@/components/privacy/DeleteAccount";
 import { getMe, getSubjects } from "@/server/learn";
 import { APP_NAME } from "@/lib/site";
@@ -21,8 +22,7 @@ async function Profile() {
   return (
     <>
       <header className="ap-hello">
-        {/* eslint-disable-next-line @next/next/no-img-element -- student photo from Supabase storage */}
-        {me.avatarUrl ? <img src={me.avatarUrl} alt="" className="ap-avatar" /> : <span className="ap-avatar" aria-hidden="true">{me.firstName[0]}</span>}
+        <ProfilePhoto url={me.avatarUrl} initial={me.firstName[0]} />
         <div>
           <h1 className="ap-h1">{me.fullName}</h1>
           <p className="ap-meta">{me.rollNo} · {YEAR[me.year ?? 0]} year · AI-ML · Section {me.section}</p>

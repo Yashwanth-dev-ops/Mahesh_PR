@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
+import { PhotoEditor } from "@/components/photo/PhotoEditor";
 
 type Common = { name: string; label: string; error?: string; hint?: string; aside?: ReactNode; onEdit?: () => void };
 
@@ -71,26 +72,35 @@ export function PasswordField({ autoComplete, ...c }: Common & { autoComplete: "
 
 /** Photo picker: a real file input (keyboard and screen-reader friendly) styled as a button, plus the file name. */
 export function PhotoField({ name, label, error, hint, onEdit }: Common) {
-  const [file, setFile] = useState("");
+  const input = useRef<HTMLInputElement>(null);
+  const kept = useRef<File | null>(null); // the last saved crop, kept if the editor is cancelled
+  const [editing, setEditing] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
+  const put = (f: File | null) => { // what the form will send
+    const dt = new DataTransfer(); if (f) dt.items.add(f); input.current!.files = dt.files;
+  };
   return (
     <Wrap name={name} label={label} error={error} hint={hint}>
       <div className="au-file">
         <input
-          id={name} name={name} type="file" accept="image/jpeg,image/png,image/webp"
+          ref={input} id={name} name={name} type="file" accept="image/jpeg,image/png,image/webp"
           aria-invalid={error ? true : undefined} aria-describedby={describe(name, error, hint)}
-          onChange={(e) => {
-            const f = e.currentTarget.files?.[0];
-            setFile(f?.name ?? "");
-            setPreview((old) => { if (old) URL.revokeObjectURL(old); return f && f.type.startsWith("image/") ? URL.createObjectURL(f) : ""; });
-            onEdit?.();
-          }}
+          onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f && f.type.startsWith("image/")) setEditing(f); }}
         />
-        {/* eslint-disable-next-line @next/next/no-img-element -- local preview of the chosen photo */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- local preview of the cropped photo */}
         {preview && <img src={preview} alt="" className="au-thumb" />}
-        <span className="au-fileBtn" aria-hidden="true">{file ? "Change photo" : "Choose photo"}</span>
-        <span className="au-fileName" aria-hidden="true">{file || "No photo yet"}</span>
+        <span className="au-fileBtn" aria-hidden="true">{preview ? "Change photo" : "Choose photo"}</span>
+        <span className="au-fileName" aria-hidden="true">{preview ? "Photo ready" : "No photo yet"}</span>
       </div>
+      {editing && (
+        <PhotoEditor key={`${editing.name}${editing.size}${editing.lastModified}`} file={editing} onChangePhoto={setEditing}
+          onCancel={() => { put(kept.current); setEditing(null); }}
+          onSave={(cropped) => {
+            kept.current = cropped; put(cropped); setEditing(null);
+            setPreview((old) => { if (old) URL.revokeObjectURL(old); return URL.createObjectURL(cropped); });
+            onEdit?.();
+          }} />
+      )}
     </Wrap>
   );
 }

@@ -7,6 +7,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
 import { PRIVACY_VERSION } from "@/lib/site";
 import { audit } from "@/server/audit";
+import { savePhoto } from "@/server/photo";
 
 export type SignupResult = { errors?: SignupErrors; message?: string; ok?: true; status?: "active" | "pending" };
 export type LoginResult = { errors?: { roll?: string; email?: string; password?: string }; message?: string; ok?: true; to?: string; name?: string; roll?: string };
@@ -50,26 +51,6 @@ async function networkBlocked(ip: string) {
 }
 const recordFailure = async (ip: string) => { await supabaseAdmin().rpc("rate_hit", { p_key: `login-ip:${ip}`, p_limit: 1_000_000, p_window_seconds: IP_FAILS.minutes * 60 }); };
 
-// A phone photo (2–4 MB) becomes a 512 px WebP of about 30–60 KB: it's only ever shown small, on the library card.
-async function shrinkPhoto(photo: File): Promise<{ body: Blob | Buffer; ext: string; type: string }> {
-  try {
-    const sharp = (await import("sharp")).default;
-    const body = await sharp(Buffer.from(await photo.arrayBuffer())).rotate().resize(512, 512, { fit: "cover" }).webp({ quality: 80 }).toBuffer();
-    return { body, ext: "webp", type: "image/webp" };
-  } catch {
-    return { body: photo, ext: photo.type.split("/")[1], type: photo.type }; // unreadable image: keep it as sent (already checked ≤ 2 MB)
-  }
-}
-
-async function savePhoto(userId: string, photo: File) {
-  const admin = supabaseAdmin();
-  const { body, ext, type } = await shrinkPhoto(photo);
-  const path = `${userId}/avatar.${ext}`;
-  const up = await admin.storage.from("avatars").upload(path, body, { contentType: type, upsert: true });
-  if (up.error) return;
-  await admin.from("profiles").update({ avatar_path: path }).eq("id", userId);
-  await admin.storage.from("avatars").remove(["jpeg", "png", "webp"].filter((e) => e !== ext).map((e) => `${userId}/avatar.${e}`)); // old copies
-}
 
 /** API.md signUpStudent: roster roll → active (after email confirm), otherwise pending admin approval. */
 export async function signUpStudent(form: FormData): Promise<SignupResult> {
