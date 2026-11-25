@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { signOut } from "@/app/actions/auth";
-import { AdminNav } from "@/components/admin/AdminNav";
+import { AdminNav, AdminTabs, AdminTopMenu } from "@/components/admin/AdminNav";
 import { APP_NAME } from "@/lib/site";
 import "@/components/admin/admin.css";
 
@@ -15,10 +15,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <nav className="ad-side" aria-label="Admin">
         <p className="ad-brand"><span className="ad-mark" aria-hidden="true">{APP_NAME[0]}</span><span>{APP_NAME}<span className="ad-tag">ADMIN</span></span></p>
         {/* AdminNav reads the URL (current page); Suspense keeps the rest prerenderable. */}
-        <Suspense fallback={<ul />}><AdminNav /></Suspense>
+        <Suspense fallback={<ul className="ad-sideList" />}><AdminNav /></Suspense>
         <form action={signOut}><button className="ad-sideOut">Sign out</button></form>
+        <AdminTopMenu />
       </nav>
       <main className="ad-main">{children}</main>
+      <Suspense fallback={null}><AdminTabs /></Suspense>
     </div>
   );
 }

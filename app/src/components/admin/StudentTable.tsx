@@ -23,6 +23,7 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
   const [msg, setMsg] = useState("");
   const [menu, setMenu] = useState<StudentRow | null>(null);
   const [dialog, setDialog] = useState<{ kind: "block" | "delete"; row: StudentRow } | null>(null);
+  const [sheet, setSheet] = useState<StudentRow | null>(null);
   const search = useRef<HTMLInputElement>(null);
   const menuEl = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
@@ -108,13 +109,25 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
           <h1 className="ad-h1">Students</h1>
           <p className="ad-meta">{rows.length} students · AI-ML · phone numbers are visible to admins only</p>
         </div>
-        <div className="ad-actions">
+        <div className="ad-actions ad-phoneHide">
           <Link className="ad-btnLine" href="/admin/bulk">Bulk register (CSV)</Link>
           <a className="ad-btnLine" href="/admin/students/export" download>Export CSV</a>
         </div>
       </header>
 
-      <section className="ad-stats" aria-label="Filter by status">
+      <div className="ad-chipRow ad-phoneOnly" role="group" aria-label="Filter by status">
+        {([["all", `All ${counts.all}`], ["pending", `Waiting ${counts.pending}`], ["active", `Active ${counts.active}`], ["suspended", `Blocked ${counts.suspended}`]] as const).map(([k, l]) => (
+          <button key={k} type="button" className="ad-pChip" aria-pressed={status === k} onClick={() => setStatus(status === k && k !== "all" ? "all" : k)}>{k === "pending" && <span className="ad-dot" aria-hidden="true" />}{l}</button>
+        ))}
+      </div>
+      {classes.length > 0 && (
+        <div className="ad-chipRow ad-phoneOnly" role="group" aria-label="Filter by class">
+          <button type="button" className="ad-pChip" aria-pressed={klass === "all"} onClick={() => setKlass("all")}>All classes</button>
+          {classes.map(([k, n]) => <button key={k} type="button" className="ad-pChip" aria-pressed={klass === k} onClick={() => setKlass(klass === k ? "all" : k)}>{k} · {n}</button>)}
+        </div>
+      )}
+
+      <section className="ad-stats ad-phoneHide" aria-label="Filter by status">
         {statCard("all", counts.all, "students in the class")}
         {statCard("pending", counts.pending, "waiting for approval", true)}
         {statCard("active", counts.active, "active")}
@@ -122,7 +135,7 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
       </section>
 
       {classes.length > 0 && (
-        <section className="ad-card ad-byClass" aria-label="By year and section">
+        <section className="ad-card ad-byClass ad-phoneHide" aria-label="By year and section">
           <span className="ad-strong">By year and section</span>
           {classes.map(([k, n]) => (
             <button key={k} type="button" className="ad-chip" data-on={klass === k || undefined} aria-pressed={klass === k} onClick={() => setKlass(klass === k ? "all" : k)}>
@@ -139,10 +152,10 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
           <input ref={search} type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or roll number" />
           <kbd className="ad-kbd" aria-hidden="true">/</kbd>
         </label>
-        <label className="ad-select"><span className="ad-sr">Year and section</span>
+        <label className="ad-select ad-phoneHide"><span className="ad-sr">Year and section</span>
           <select value={klass} onChange={(e) => setKlass(e.target.value)}><option value="all">Class: All</option>{classes.map(([k]) => <option key={k} value={k}>{k}</option>)}</select>
         </label>
-        <label className="ad-select"><span className="ad-sr">Status</span>
+        <label className="ad-select ad-phoneHide"><span className="ad-sr">Status</span>
           <select value={status} onChange={(e) => setStatus(e.target.value as Status | "all")}>
             <option value="all">Status: All</option><option value="pending">Waiting</option><option value="active">Active</option><option value="suspended">Blocked</option>
           </select>
@@ -151,7 +164,25 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
 
       <p className="ad-meta ad-live" role="status">{msg}</p>
 
-      <section className="ad-card ad-tableCard" aria-label="Students">
+      {/* Phones (Figma B6): one-tap rows; tapping opens the student sheet (B7). */}
+      <ul className="ad-pList ad-phoneOnly" aria-label="Students">
+        {shown.length === 0 && <li><p className="ad-meta" style={{ padding: 16 }}>{rows.length ? "No students match." : "No students yet."}</p></li>}
+        {shown.map((r) => (
+          <li key={r.id} aria-busy={busy === r.id || undefined}>
+            <button type="button" className="ad-pRow" onClick={() => setSheet(r)} aria-label={`${r.name}, ${LABEL[r.status]}. Open details`}>
+              <span className="ad-av" data-wait={r.status === "pending" || undefined} aria-hidden="true">{r.name[0]?.toUpperCase()}</span>
+              <span className="ad-pText">
+                <span className="ad-pName">{r.name}</span>
+                <span className="ad-pMeta" data-bad={r.status === "suspended" || undefined}>{r.status === "suspended" ? r.note : `${r.roll} · ${r.year ? `${Y[r.year]} ${r.section ?? ""}` : "—"}`}</span>
+              </span>
+            </button>
+            {r.status === "pending" ? <button type="button" className="ad-btnLine ad-small" disabled={busy === r.id} onClick={() => act(r, "active")}>Approve</button>
+              : <span className={`ad-badge ad-badge-${r.status}`}>{LABEL[r.status]}</span>}
+          </li>
+        ))}
+      </ul>
+
+      <section className="ad-card ad-tableCard ad-phoneHide" aria-label="Students">
         {shown.length === 0 ? <p className="ad-empty">{rows.length ? "No students match. Clear the search or filters." : "No students yet. Import the class list or use Bulk register."}</p> : (
           <div className="ad-tableWrap">
             <table className="ad-table ad-students">
@@ -205,6 +236,8 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
         </>}
       </div>
 
+      {sheet && <StudentSheet key={sheet.id} row={rows.find((x) => x.id === sheet.id) ?? sheet} busy={busy === sheet.id} onClose={() => setSheet(null)}
+        onAct={(to) => act(sheet, to)} onAsk={(kind) => { setSheet(null); setDialog({ kind, row: sheet }); }} onCopy={() => copyPhone(sheet)} />}
       {dialog && <ConfirmDialog key={dialog.kind + dialog.row.id} {...dialog} busy={busy === dialog.row.id} onClose={() => setDialog(null)}
         onBlock={(reason) => act(dialog.row, "suspended", reason)} onDelete={(typed) => remove(dialog.row, typed)} />}
     </>
@@ -235,6 +268,46 @@ function ConfirmDialog({ kind, row, busy, onClose, onBlock, onDelete }: { kind: 
           <button className={del ? "ad-btnDanger" : "ad-btnInk"} disabled={!ready || busy}>{busy ? (del ? "Deleting…" : "Blocking…") : del ? "Delete account" : "Block student"}</button>
         </div>
       </form>
+    </dialog>
+  );
+}
+
+/** Figma B7: tap a student on a phone. Native modal dialog sliding up; Escape or a tap outside closes it. */
+function StudentSheet({ row, busy, onClose, onAct, onAsk, onCopy }: { row: StudentRow; busy: boolean; onClose: () => void; onAct: (to: "active" | "suspended") => void; onAsk: (k: "block" | "delete") => void; onCopy: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => { ref.current?.showModal(); }, []);
+  const close = () => ref.current?.close();
+  return (
+    <dialog ref={ref} className="ad-sheet" aria-labelledby="sheet-name" onClose={onClose} onClick={(e) => { if (e.target === ref.current) close(); }}>
+      <div className="ad-sheetInner">
+        <span className="ad-grab" aria-hidden="true" />
+        <div className="ad-who">
+          <span className="ad-av" data-wait={row.status === "pending" || undefined} aria-hidden="true">{row.name[0]?.toUpperCase()}</span>
+          <div className="ad-pText"><p id="sheet-name" className="ad-whoName">{row.name}</p><p className="ad-mono">{row.roll} · {row.year ? `${Y[row.year]} ${row.section ?? ""}` : "—"} · {day(row.joined)}</p></div>
+          <span className={`ad-badge ad-badge-${row.status}`}>{LABEL[row.status]}</span>
+        </div>
+        {row.status !== "active" && <p className={row.status === "suspended" ? "ad-noteBad" : "ad-note"} style={{ margin: 0 }}>{row.note}</p>}
+        <div className="ad-contact">
+          <div><p className="ad-label2">Mobile</p><p className="ad-big">{phoneText(row.phone)}</p></div>
+          {row.phone && (
+            <div className="ad-callRow">
+              <a href={`tel:+91${row.phone}`}>Call</a>
+              <a href={`https://wa.me/91${row.phone}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <button type="button" onClick={onCopy}>Copy</button>
+            </div>
+          )}
+          <div><p className="ad-label2">Email</p><p style={{ margin: 0, fontSize: 14, fontWeight: 500, overflowWrap: "anywhere" }}>{row.email || "—"}</p></div>
+        </div>
+        {row.status === "pending" && <button type="button" className="ad-btnInk" disabled={busy} onClick={() => onAct("active")}>{busy ? "Approving…" : "Approve"}</button>}
+        {row.status === "suspended" && <button type="button" className="ad-btnInk" disabled={busy} onClick={() => onAct("active")}>{busy ? "Giving access…" : "Give access"}</button>}
+        <div className="ad-sheetList">
+          {row.status === "active" && <button type="button" onClick={() => onAsk("block")}>Block student…</button>}
+          {row.status === "pending" && <button type="button" disabled={busy} onClick={() => onAct("suspended")}>Reject</button>}
+          <Link href={`/admin/audit?q=${encodeURIComponent(row.roll)}`}>View in audit log</Link>
+          <button type="button" className="ad-menuDanger" onClick={() => onAsk("delete")}>Delete account…</button>
+        </div>
+        <button type="button" className="ad-btnLine" onClick={close}>Done</button>
+      </div>
     </dialog>
   );
 }
