@@ -54,3 +54,5 @@ next-env.d.ts
 /supabase/.branches
 # Per-developer Impeccable settings
 /.impeccable/config.local.json
+# Design-checker cache (machine-local)
+/.impeccable/hook.cache.json
