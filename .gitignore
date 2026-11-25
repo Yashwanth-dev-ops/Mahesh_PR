@@ -13,3 +13,4 @@ node_modules/
 
 # Pentest reports stay private (public repo)
 /pentest/
+.impeccable/hook.cache.json
