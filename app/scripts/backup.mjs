@@ -2,7 +2,8 @@
 //
 //   node --env-file=.env.local scripts/backup.mjs [--out backups] [--files-only]
 //
-// Writes backups/backup-YYYY-MM-DD.tar.zst. Copy it to Google Drive (and keep a second copy somewhere else).
+// Writes backups/backup-YYYY-MM-DD.7z, encrypted (AES-256, file names hidden too) with BACKUP_PASSWORD.
+// It opens anywhere with that one password: Windows with 7-Zip or NanaZip, WSL/Linux with `7z x`.
 // Check or restore it with scripts/restore.mjs. Run weekly during the pilot.
 //
 // Inside the archive:
@@ -12,7 +13,7 @@
 //   db/auth.sql                        accounts (auth.users + auth.identities, passwords stay hashed)
 //   db/data.sql                        all rows of the public tables
 //
-// Needs pg_dump 17+ (sudo apt-get install -y postgresql-client), tar and zstd.
+// Needs pg_dump 17+ (sudo apt-get install -y postgresql-client) and 7-Zip (sudo apt-get install -y 7zip).
 // The database address comes from supabase/.temp/pooler-url (written by `supabase link`) or DATABASE_URL,
 // the password from SUPABASE_DB_PASSWORD. --files-only skips the database (for when pg_dump isn't installed).
 import { createClient } from "@supabase/supabase-js";
@@ -29,6 +30,7 @@ const FILES_ONLY = args.includes("--files-only");
 const BUCKETS = ["materials", "papers", "avatars"];
 const sha = (buf) => createHash("sha256").update(buf).digest("hex");
 const has = (cmd) => { try { execFileSync("sh", ["-c", `command -v ${cmd}`], { stdio: "ignore" }); return true; } catch { return false; } };
+export const sevenZip = () => ["7z", "7zz", "7za"].find(has);
 
 export function dbConnection(env = process.env, poolerFile = "supabase/.temp/pooler-url") {
   const raw = env.DATABASE_URL || (existsSync(poolerFile) && readFileSync(poolerFile, "utf8").trim());
@@ -56,7 +58,10 @@ async function listAll(store, prefix = "") {
 }
 
 async function main() {
-  if (!has("tar") || !has("zstd")) throw new Error("tar and zstd are needed.");
+  const zip = sevenZip();
+  if (!zip) throw new Error("7-Zip isn't installed. Run: sudo apt-get install -y 7zip");
+  const pw = process.env.BACKUP_PASSWORD;
+  if (!pw || pw.length < 16) throw new Error("Set BACKUP_PASSWORD (16+ characters) in .env.local, and keep it in your password manager.");
   if (!FILES_ONLY && !has("pg_dump")) throw new Error("pg_dump isn't installed. Run: sudo apt-get install -y postgresql-client  (or add --files-only)");
   const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
   const day = new Date().toISOString().slice(0, 10);
@@ -100,13 +105,15 @@ async function main() {
 
     writeFileSync(join(work, "manifest.json"), JSON.stringify(manifest, null, 2));
     mkdirSync(OUT, { recursive: true });
-    let out = join(OUT, `backup-${day}.tar.zst`);
-    for (let n = 2; existsSync(out); n++) out = join(OUT, `backup-${day}-${n}.tar.zst`); // never overwrite an older backup
-    execFileSync("tar", ["-I", "zstd -10 -T0", "-cf", out, "-C", work, "."]);
+    let out = join(OUT, `backup-${day}.7z`);
+    for (let n = 2; existsSync(out); n++) out = join(OUT, `backup-${day}-${n}.7z`); // never overwrite an older backup
+    // shortcut: 7-Zip takes the password as an argument, briefly visible to other users of this machine (`ps`);
+    // fine on a single-user laptop or the backup container, revisit if the machine is shared.
+    execFileSync(zip, ["a", "-t7z", "-mx=7", "-mhe=on", `-p${pw}`, out, "."], { cwd: work, stdio: "ignore" });
     const raw = manifest.files.reduce((s, f) => s + f.size, 0) + manifest.db.reduce((s, f) => s + f.size, 0);
     const mb = (n) => (n / 1048576).toFixed(1) + " MB";
     console.log(`\nSaved ${out}\n  ${manifest.files.length} files + ${manifest.db.length} database files, ${mb(raw)} packed into ${mb(statSync(out).size)}`);
-    console.log("  Next: copy it to Google Drive. Check it any time with: npm run restore -- " + out);
+    console.log("  Opens on Windows (7-Zip / NanaZip) and WSL (7z x) with BACKUP_PASSWORD. Check it any time with: npm run restore -- " + out);
   } finally {
     rmSync(work, { recursive: true, force: true });
   }

@@ -22,6 +22,7 @@ Every upload is checked by an admin, and the same file can never be added twice 
 
 ## Operating Context
 - Two logins: student and admin (admins are created only by admins).
+- B.Tech runs 4 years (I–IV year). Lateral-entry students (diploma holders) join directly in II year, so they study 3 years; they are on the same class lists and sections as regular students from II year on.
 - Student sign-up runs against a class roster: an admin uploads the class list as CSV (roll_no, full_name, year, section). A student who signs up with a roll number and name that match the list gets in at once. Anyone not on the list, with a name that differs, or signing up with Google waits as "pending" until an admin approves or rejects them. Re-importing the list approves pending students who now match.
 - Pilot content is loaded by an admin from a folder with an import script (subjects, chapters, PDFs, past papers). Student uploads come after the pilot.
 - Materials are behind login; only the landing page and login are public.

@@ -55,13 +55,19 @@ Never log passwords, tokens, keys, file contents or emails. Log: auth failures, 
 CSP, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (camera/mic off), HSTS (Vercel).
 
 ## 12. Checklist
-- ☐ Auth + email verification
+- ☑ Auth; ☐ email verification at sign-up
 - ☐ Role checks in middleware, actions and RLS
-- ☐ RLS tests for every table
+- ☑ RLS checked live for every table (pentest 2026-11-25); ☐ automated RLS tests in CI
 - ☐ Server-side Zod validation
 - ☐ Magic-byte file checks + size limits
-- ☐ Signed URLs, private buckets
+- ☑ Signed URLs for materials/papers; ☐ make the avatars bucket private
 - ☑ Rate limits (sign-in, reset, sign-up); ☐ uploads, comments, reports
 - ☐ Errors leak nothing
-- ☐ Service key never in client bundle (build check)
+- ☑ Service key never in client bundle (checked 2026-11-25)
 - ☐ `npm audit` clean of high/critical
+
+## 13. Pentest 2026-11-25 (grey box, owner-run)
+Fixed: profiles readable only by the owner and admins; students can edit only `bio` and `links`; sign-in failures
+limited per network as well as per roll number; security headers (frame-ancestors, HSTS, nosniff, referrer and
+permissions policy). Planned: email verification at sign-up, private avatars bucket, nonce-based script CSP.
+The full report is kept privately by the owner.

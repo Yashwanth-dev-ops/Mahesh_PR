@@ -37,7 +37,17 @@ async function overLimit(kind: keyof typeof LIMITS, id: string) {
   // If the counter itself fails, let the attempt through: the sign-in check behind it still protects the account.
   return !error && typeof data === "number" && data > 0 ? tooMany(data) : null;
 }
-const clientIp = async () => (await headers()).get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
+// Vercel sets x-real-ip itself (a client can't forge it there); x-forwarded-for is the fallback elsewhere.
+const clientIp = async () => { const h = await headers(); return h.get("x-real-ip") || h.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"; };
+// Password spraying guard: wrong sign-ins per network, counted only on failure so a class signing in together on one
+// college Wi-Fi is never blocked. 50 failures in 15 minutes from one address stops further tries.
+const IP_FAILS = { max: 50, minutes: 15 };
+async function networkBlocked(ip: string) {
+  const since = new Date(Date.now() - IP_FAILS.minutes * 60_000).toISOString();
+  const { count } = await supabaseAdmin().from("rate_events").select("id", { count: "exact", head: true }).eq("key", `login-ip:${ip}`).gt("at", since);
+  return (count ?? 0) >= IP_FAILS.max;
+}
+const recordFailure = async (ip: string) => { await supabaseAdmin().rpc("rate_hit", { p_key: `login-ip:${ip}`, p_limit: 1_000_000, p_window_seconds: IP_FAILS.minutes * 60 }); };
 
 // A phone photo (2–4 MB) becomes a 512 px WebP of about 30–60 KB: it's only ever shown small, on the library card.
 async function shrinkPhoto(photo: File): Promise<{ body: Blob | Buffer; ext: string; type: string }> {
@@ -112,15 +122,18 @@ export async function signIn(form: FormData): Promise<LoginResult> {
   if (hasErrors(errors)) return { errors };
 
   // Counted before the lookup, so unknown roll numbers are limited exactly like real ones.
+  const ip = await clientIp();
+  if (await networkBlocked(ip)) return { message: tooMany(IP_FAILS.minutes * 60) };
   const limited = await overLimit("login", roll);
   if (limited) return { message: limited };
   const { data: email } = await supabaseAdmin().rpc("email_for_roll", { p_roll: roll });
-  if (!email) return { message: WRONG };
+  if (!email) { await recordFailure(ip); return { message: WRONG }; }
 
   const supabase = await supabaseServer();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
     if (/not confirmed/i.test(error.message)) return { message: "Confirm your email first: open the link we sent you." };
+    await recordFailure(ip);
     return { message: WRONG };
   }
   await supabaseAdmin().rpc("rate_clear", { p_key: `login:${roll}` }); // right password: start the count again

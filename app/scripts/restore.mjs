@@ -1,6 +1,6 @@
 // Check a backup, or put it back into an EMPTY Supabase project.
 //
-//   node --env-file=.env.local scripts/restore.mjs <backup.tar.zst>            check only: every file's SHA-256
+//   node --env-file=.env.local scripts/restore.mjs <backup.7z | .tar.zst>      check only: every file's SHA-256
 //   node --env-file=.env.local scripts/restore.mjs <backup.tar.zst> --into     check, then restore into the project in
 //       RESTORE_SUPABASE_URL + RESTORE_SERVICE_ROLE_KEY + RESTORE_DATABASE_URL (password inside it or RESTORE_DB_PASSWORD)
 //
@@ -12,7 +12,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { dbConnection } from "./backup.mjs";
+import { dbConnection, sevenZip } from "./backup.mjs";
 
 const [archive, ...flags] = process.argv.slice(2);
 const INTO = flags.includes("--into");
@@ -62,7 +62,12 @@ async function main() {
   if (!archive || !existsSync(archive)) throw new Error("Usage: restore.mjs <backup.tar.zst> [--into]");
   const dir = mkdtempSync(join(tmpdir(), "library-restore-"));
   try {
-    execFileSync("tar", ["-I", "zstd", "-xf", archive, "-C", dir]);
+    if (archive.endsWith(".7z")) {
+      const zip = sevenZip();
+      if (!zip) throw new Error("7-Zip isn't installed. Run: sudo apt-get install -y 7zip");
+      try { execFileSync(zip, ["x", "-y", `-p${process.env.BACKUP_PASSWORD ?? ""}`, `-o${dir}`, archive], { stdio: "ignore" }); }
+      catch { throw new Error("Couldn't open it: wrong BACKUP_PASSWORD, or the file is damaged."); }
+    } else execFileSync("tar", ["-I", "zstd", "-xf", archive, "-C", dir]); // older .tar.zst backups
     const manifest = JSON.parse(readFileSync(join(dir, "manifest.json"), "utf8"));
     const bad = verify(dir, manifest);
     if (bad.length) throw new Error(`archive is damaged:\n  ${bad.slice(0, 20).join("\n  ")}`);

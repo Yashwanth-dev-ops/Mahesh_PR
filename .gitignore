@@ -10,3 +10,6 @@ node_modules/
 # Tool working folders (browser profiles with logins, caches)
 .taste-skill/
 .gstack/
+
+# Pentest reports stay private (public repo)
+/pentest/
