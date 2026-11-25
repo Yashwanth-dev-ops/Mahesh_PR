@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { signOut } from "@/app/actions/auth";
 
 const ITEMS = [["/admin", "Dashboard"], ["/admin/students", "Students"], ["/admin/admins", "Admins"], ["/admin#notices", "Notices"], ["/admin#feedback", "Feedback"], ["/admin#content", "Content"], ["/admin/audit", "Audit log"]];
@@ -27,9 +28,22 @@ const TABS: [string, string, string][] = [
   ["/admin/audit", "Audit log", "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"],
 ];
 
+// Only one menu open at a time (Safari can leave two "auto" popovers open), and a tap on an item closes its menu.
+const MENUS = ["ad-more", "ad-top"];
+function useOneMenu() {
+  useEffect(() => {
+    const els = MENUS.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    const onToggle = (e: Event) => { if ((e as ToggleEvent).newState === "open") els.forEach((o) => { if (o !== e.target && o.matches(":popover-open")) o.hidePopover(); }); };
+    const onClick = (e: Event) => { const m = (e.target as HTMLElement).closest("[popover]") as HTMLElement | null; if (m && (e.target as HTMLElement).closest("a,button")) m.hidePopover(); };
+    els.forEach((el) => { el.addEventListener("toggle", onToggle); el.addEventListener("click", onClick); });
+    return () => els.forEach((el) => { el.removeEventListener("toggle", onToggle); el.removeEventListener("click", onClick); });
+  }, []);
+}
+
 /** Phones (Figma B6): bottom tab bar, plus "More" for the rest. Native popovers: Escape and a tap outside close them. */
 export function AdminTabs() {
   const path = usePathname();
+  useOneMenu();
   return (
     <>
       <nav className="ad-tabs" aria-label="Admin">

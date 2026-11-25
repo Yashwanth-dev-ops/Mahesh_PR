@@ -229,6 +229,7 @@
 .ad-pop:not(:popover-open) { opacity: 0; scale: 0.97; transition-duration: 100ms; }
 .ad-pop a, .ad-pop button { display: block; width: 100%; padding: 13px 16px; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 500; color: var(--ink); text-align: left; text-decoration: none; cursor: pointer; }
 .ad-pop a:focus-visible, .ad-pop button:focus-visible { outline: none; background: var(--surface); }
+.ad-pop::backdrop { background: rgb(8 9 11 / 0.25); }
 .ad-pop hr { margin: 6px 0; border: 0; border-top: 1px solid var(--border); }
 .ad-pop form { margin: 0; }
 @media (max-width: 700px) {
