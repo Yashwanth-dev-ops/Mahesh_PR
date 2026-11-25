@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 /**
  * Starts the cinematic intro on the first visit of a session (the head script in app/layout.tsx
@@ -43,16 +43,4 @@ export function IntroController() {
   }, []);
 
   return null;
-}
-
-/** Menu button that reports its state; the menu panel itself comes with the app navigation. */
-export function MenuButton({ className }: { className: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <button type="button" className={className} aria-expanded={open} aria-label="Menu" onClick={() => setOpen(!open)}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-        <path d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
-  );
 }

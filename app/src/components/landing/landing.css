@@ -149,3 +149,21 @@
 @keyframes pop    { from { opacity: 0; transform: scale(0.4); } }
 @keyframes float  { from { translate: 0 0; } to { translate: 0 -10px; } }
 @keyframes orbit  { to { rotate: 1turn; } }
+
+/* ---------- menu sheet (the three bars) ---------- */
+.lp-sheet { position: fixed; inset: 0 0 auto 0; width: 100%; max-width: none; margin: 0; padding: 84px 24px 28px; border: 0; border-bottom: 1px solid #23252a;
+  background: var(--l-bg); color: var(--l-ink); transform: translateY(0); opacity: 1;
+  transition: transform 220ms var(--ease-out), opacity 220ms var(--ease-out), overlay 220ms allow-discrete, display 220ms allow-discrete; }
+@starting-style { .lp-sheet:popover-open { transform: translateY(-12px); opacity: 0; } }
+.lp-sheet:not(:popover-open) { transform: translateY(-12px); opacity: 0; transition-duration: 160ms; }
+.lp-sheet::backdrop { background: rgb(0 0 0 / 0.5); }
+.lp-sheet ul { list-style: none; margin: 0 0 24px; padding: 0; }
+.lp-sheet li a { display: flex; align-items: center; min-height: 56px; font-size: 28px; font-weight: 600; letter-spacing: -0.01em; border-bottom: 1px solid #1c1d21; }
+.lp-sheetClose { position: absolute; top: 20px; left: 13px; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--l-ink); cursor: pointer; }
+.lp-sheetActs { display: flex; flex-direction: column; gap: 12px; }
+.lp-sheetPrimary, .lp-sheetLine { display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 999px; font-weight: 600; font-size: 16px; }
+.lp-sheetPrimary { background: var(--l-yellow); color: var(--l-bg); }
+.lp-sheetLine { border: 1.5px solid #3a3c42; color: var(--l-ink); }
+.lp-menu:focus-visible, .lp-sheetClose:focus-visible, .lp-sheet a:focus-visible { outline: 2px solid var(--l-yellow); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .lp-sheet, .lp-sheet:not(:popover-open) { transform: none; } }
+@media (min-width: 900px) { .lp-sheet { inset: 0 auto 0 0; width: 380px; height: 100svh; border-bottom: 0; border-right: 1px solid #23252a; } }
