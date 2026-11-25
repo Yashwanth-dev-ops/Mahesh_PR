@@ -1,6 +1,7 @@
 # Never upload local-only or sensitive files to Vercel
 backups
 *.local.md
+*.local.pdf
 .env*
 .gstack
 .impeccable

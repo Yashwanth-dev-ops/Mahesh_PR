@@ -19,7 +19,9 @@ export function PdfReader({ url, materialId, chapterId, startPage = 1 }: { url: 
       try {
         const pdfjs = await import("pdfjs-dist");
         pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
-        const d = await pdfjs.getDocument({ url, isEvalSupported: false }).promise;
+        // One plain GET (no streaming / range requests), so it reuses the download the server page already started
+        // with preload(). shortcut: very large PDFs then load whole before page 1; ours are compressed to a few MB.
+        const d = await pdfjs.getDocument({ url, isEvalSupported: false, disableRange: true, disableStream: true }).promise;
         if (!alive) return;
         setDoc(d); setPage((p) => Math.min(Math.max(1, p), d.numPages)); setState("ready");
       } catch { if (alive) setState("error"); }

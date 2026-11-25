@@ -4,6 +4,7 @@
 !.env.example
 *.local.md
 *.local.json
+*.local.pdf
 node_modules/
 .DS_Store
 
