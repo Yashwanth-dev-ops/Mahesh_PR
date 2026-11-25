@@ -257,6 +257,8 @@
   .ad-pChip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
   .ad-pChip .ad-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); }
   .ad-filters .ad-search { flex-basis: 100%; }
+  .ad-kbd { display: none; } /* no keyboard shortcut on a phone */
+  .ad-live:empty { display: none; }
   .ad-pList { flex-direction: column; margin: 0; padding: 0; list-style: none; background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
   .ad-pList li { display: flex; align-items: center; gap: 8px; padding-right: 12px; border-bottom: 1px solid var(--border); }
   .ad-pList li:last-child { border-bottom: 0; }
