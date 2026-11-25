@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "@/app/actions/auth";
 
 const ITEMS = [["/admin", "Dashboard"], ["/admin/students", "Students"], ["/admin/admins", "Admins"], ["/admin#notices", "Notices"], ["/admin#feedback", "Feedback"], ["/admin#content", "Content"], ["/admin/audit", "Audit log"]];
@@ -28,52 +28,64 @@ const TABS: [string, string, string][] = [
   ["/admin/audit", "Audit log", "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"],
 ];
 
-// Only one menu open at a time (Safari can leave two "auto" popovers open), and a tap on an item closes its menu.
-const MENUS = ["ad-more", "ad-top"];
-function useOneMenu() {
+// Phone menus: plain React state (no popover API), so they behave the same in every browser, old iPhones included.
+// Only one is open at a time; a tap outside, Escape, or tapping an item closes it.
+const OPEN_EVENT = "ad-menu-open";
+function useMenu(id: string) {
+  const [open, setOpen] = useState(false);
   useEffect(() => {
-    const els = MENUS.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
-    const onToggle = (e: Event) => { if ((e as ToggleEvent).newState === "open") els.forEach((o) => { if (o !== e.target && o.matches(":popover-open")) o.hidePopover(); }); };
-    const onClick = (e: Event) => { const m = (e.target as HTMLElement).closest("[popover]") as HTMLElement | null; if (m && (e.target as HTMLElement).closest("a,button")) m.hidePopover(); };
-    els.forEach((el) => { el.addEventListener("toggle", onToggle); el.addEventListener("click", onClick); });
-    return () => els.forEach((el) => { el.removeEventListener("toggle", onToggle); el.removeEventListener("click", onClick); });
-  }, []);
+    const other = (e: Event) => { if ((e as CustomEvent<string>).detail !== id) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    addEventListener(OPEN_EVENT, other); addEventListener("keydown", esc);
+    return () => { removeEventListener(OPEN_EVENT, other); removeEventListener("keydown", esc); };
+  }, [id]);
+  const toggle = () => setOpen((o) => { if (!o) dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: id })); return !o; });
+  return { open, toggle, close: () => setOpen(false) };
 }
+const Scrim = ({ onClose }: { onClose: () => void }) => <button type="button" className="ad-scrim" aria-label="Close menu" onClick={onClose} />;
 
-/** Phones (Figma B6): bottom tab bar, plus "More" for the rest. Native popovers: Escape and a tap outside close them. */
+/** Phones (Figma B6): bottom tab bar, plus "More" for the rest. */
 export function AdminTabs() {
   const path = usePathname();
-  useOneMenu();
+  const m = useMenu("more");
+  useEffect(() => m.close(), [path]); // eslint-disable-line react-hooks/exhaustive-deps -- close on navigation
   return (
     <>
       <nav className="ad-tabs" aria-label="Admin">
         {TABS.map(([h, l, d]) => (
           <Link key={h} href={h} className="ad-tab" aria-current={isCurrent(path, h) ? "page" : undefined}><Ico d={d} /><span>{l}</span></Link>
         ))}
-        <button type="button" className="ad-tab" popoverTarget="ad-more"><Ico d="M5 12h.01M12 12h.01M19 12h.01" /><span>More</span></button>
+        <button type="button" className="ad-tab" aria-expanded={m.open} aria-controls="ad-more" onClick={m.toggle}><Ico d="M5 12h.01M12 12h.01M19 12h.01" /><span>More</span></button>
       </nav>
-      <div id="ad-more" popover="auto" className="ad-pop ad-popUp" role="menu" aria-label="More">
-        <Link role="menuitem" href="/admin#notices">Notices</Link>
-        <Link role="menuitem" href="/admin#feedback">Feedback</Link>
-        <Link role="menuitem" href="/admin#content">Content</Link>
-        <hr />
-        <form action={signOut}><button role="menuitem">Sign out</button></form>
-      </div>
+      {m.open && <>
+        <Scrim onClose={m.close} />
+        <div id="ad-more" className="ad-pop ad-popUp" role="menu" aria-label="More">
+          <Link role="menuitem" href="/admin#notices" onClick={m.close}>Notices</Link>
+          <Link role="menuitem" href="/admin#feedback" onClick={m.close}>Feedback</Link>
+          <Link role="menuitem" href="/admin#content" onClick={m.close}>Content</Link>
+          <hr />
+          <form action={signOut}><button role="menuitem">Sign out</button></form>
+        </div>
+      </>}
     </>
   );
 }
 
 /** Phones: the ⋯ in the black top bar (Figma B6) for the Students tools. */
 export function AdminTopMenu() {
+  const m = useMenu("top");
   return (
     <>
-      <button type="button" className="ad-topMore" popoverTarget="ad-top" aria-label="More actions">
+      <button type="button" className="ad-topMore" aria-expanded={m.open} aria-controls="ad-top" aria-label="More actions" onClick={m.toggle}>
         <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.8" fill="currentColor" /><circle cx="12" cy="12" r="1.8" fill="currentColor" /><circle cx="19" cy="12" r="1.8" fill="currentColor" /></svg>
       </button>
-      <div id="ad-top" popover="auto" className="ad-pop ad-popDown" role="menu" aria-label="More actions">
-        <Link role="menuitem" href="/admin/bulk">Bulk register (CSV)</Link>
-        <a role="menuitem" href="/admin/students/export" download>Export student list (CSV)</a>
-      </div>
+      {m.open && <>
+        <Scrim onClose={m.close} />
+        <div id="ad-top" className="ad-pop ad-popDown" role="menu" aria-label="More actions">
+          <Link role="menuitem" href="/admin/bulk" onClick={m.close}>Bulk register (CSV)</Link>
+          <a role="menuitem" href="/admin/students/export" download onClick={m.close}>Export student list (CSV)</a>
+        </div>
+      </>}
     </>
   );
 }

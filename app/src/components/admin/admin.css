@@ -223,13 +223,12 @@
 
 /* ---- Phones (Figma B6/B7, approved 2026-11-25): black top bar with ⋯, bottom tab bar ---- */
 .ad-tabs, .ad-topMore { display: none; }
-.ad-pop { margin: 0; padding: 6px 0; min-width: 220px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); color: var(--ink); box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
+.ad-pop { z-index: 41; margin: 0; padding: 6px 0; min-width: 220px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); color: var(--ink); box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
   opacity: 1; scale: 1; transition: opacity 150ms var(--ease-out), scale 150ms var(--ease-out), overlay 150ms allow-discrete, display 150ms allow-discrete; }
-@starting-style { .ad-pop:popover-open { opacity: 0; scale: 0.97; } }
-.ad-pop:not(:popover-open) { opacity: 0; scale: 0.97; transition-duration: 100ms; }
+@starting-style { .ad-pop { opacity: 0; scale: 0.97; } }
 .ad-pop a, .ad-pop button { display: block; width: 100%; padding: 13px 16px; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 500; color: var(--ink); text-align: left; text-decoration: none; cursor: pointer; }
 .ad-pop a:focus-visible, .ad-pop button:focus-visible { outline: none; background: var(--surface); }
-.ad-pop::backdrop { background: rgb(8 9 11 / 0.25); }
+.ad-scrim { position: fixed; inset: 0; z-index: 40; border: 0; padding: 0; background: rgb(8 9 11 / 0.25); cursor: default; }
 .ad-pop hr { margin: 6px 0; border: 0; border-top: 1px solid var(--border); }
 .ad-pop form { margin: 0; }
 @media (max-width: 700px) {
