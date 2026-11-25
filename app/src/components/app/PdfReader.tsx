@@ -1,38 +1,59 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { PDFDocumentProxy } from "pdfjs-dist";
+import type { PDFDocumentProxy, PDFWorker } from "pdfjs-dist";
 import { touchChapter } from "@/app/actions/learn";
 import { Icon, Svg } from "./bits";
+
+// One pdf.js worker for the whole tab: starting a worker costs ~150 ms, so only the first PDF of a visit pays it.
+// (Was: a new worker per PDF, never closed.)
+let pdfjsReady: Promise<{ pdfjs: typeof import("pdfjs-dist"); worker: PDFWorker }> | null = null;
+function loadPdfjs() {
+  pdfjsReady ??= import("pdfjs-dist").then((pdfjs) => {
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+    return { pdfjs, worker: new pdfjs.PDFWorker() };
+  }).catch((e) => { pdfjsReady = null; throw e; }); // a failed load is retried on the next open
+  return pdfjsReady;
+}
 
 /** Renders one PDF page at a time to fit the screen; remembers the page for "Resume at page N". */
 export function PdfReader({ url, materialId, chapterId, startPage = 1 }: { url: string; materialId?: string; chapterId?: string; startPage?: number }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const box = useRef<HTMLDivElement>(null);
+  const drawnWidth = useRef(0);
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
   const [page, setPage] = useState(startPage);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
     let alive = true;
+    let task: { destroy(): Promise<void> } | null = null;
     (async () => {
       try {
-        const pdfjs = await import("pdfjs-dist");
-        pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+        const { pdfjs, worker } = await loadPdfjs();
+        if (!alive) return;
         // One plain GET (no streaming / range requests), so it reuses the download the server page already started
         // with preload(). shortcut: very large PDFs then load whole before page 1; ours are compressed to a few MB.
-        const d = await pdfjs.getDocument({ url, isEvalSupported: false, disableRange: true, disableStream: true }).promise;
+        const t = pdfjs.getDocument({ url, worker, isEvalSupported: false, disableRange: true, disableStream: true });
+        task = t;
+        const d = await t.promise;
         if (!alive) return;
         setDoc(d); setPage((p) => Math.min(Math.max(1, p), d.numPages)); setState("ready");
-      } catch { if (alive) setState("error"); }
+      } catch {
+        pdfjsReady = null; // in case the shared worker broke: the next open starts a fresh one
+        if (alive) setState("error");
+      }
     })();
-    return () => { alive = false; };
+    // Free the document in the shared worker when leaving the page (the worker itself stays for the next PDF).
+    return () => { alive = false; task?.destroy().catch(() => {}); };
   }, [url]);
 
   const draw = useCallback(async () => {
     if (!doc || !canvas.current || !box.current) return;
+    const width = box.current.clientWidth;
+    drawnWidth.current = width;
     const pg = await doc.getPage(page);
-    const fit = box.current.clientWidth / pg.getViewport({ scale: 1 }).width;
+    const fit = width / pg.getViewport({ scale: 1 }).width;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const vp = pg.getViewport({ scale: fit * dpr });
     const c = canvas.current;
@@ -42,7 +63,8 @@ export function PdfReader({ url, materialId, chapterId, startPage = 1 }: { url: 
 
   useEffect(() => { draw().catch(() => {}); }, [draw]);
   useEffect(() => {
-    const ro = new ResizeObserver(() => draw().catch(() => {}));
+    // Only a new width needs a redraw; page and file changes are drawn by the effect above.
+    const ro = new ResizeObserver(() => { if (box.current && box.current.clientWidth !== drawnWidth.current) draw().catch(() => {}); });
     if (box.current) ro.observe(box.current);
     return () => ro.disconnect();
   }, [draw]);
