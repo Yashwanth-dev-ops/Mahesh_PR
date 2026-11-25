@@ -150,13 +150,10 @@
 @keyframes float  { from { translate: 0 0; } to { translate: 0 -10px; } }
 @keyframes orbit  { to { rotate: 1turn; } }
 
-/* ---------- menu sheet (the three bars) ---------- */
-.lp-sheet { position: fixed; inset: 0 0 auto 0; width: 100%; max-width: none; margin: 0; padding: 84px 24px 28px; border: 0; border-bottom: 1px solid #23252a;
-  background: var(--l-bg); color: var(--l-ink); transform: translateY(0); opacity: 1;
-  transition: transform 220ms var(--ease-out), opacity 220ms var(--ease-out), overlay 220ms allow-discrete, display 220ms allow-discrete; }
-@starting-style { .lp-sheet:popover-open { transform: translateY(-12px); opacity: 0; } }
-.lp-sheet:not(:popover-open) { transform: translateY(-12px); opacity: 0; transition-duration: 160ms; }
-.lp-sheet::backdrop { background: rgb(0 0 0 / 0.5); }
+/* ---------- menu sheet (the three bars): full screen, solid, above everything ---------- */
+.lp-sheet { position: fixed; inset: 0; z-index: 1000; overflow-y: auto; padding: 84px 24px calc(28px + env(safe-area-inset-bottom)); background: var(--l-bg); color: var(--l-ink);
+  animation: lp-sheet-in 220ms var(--ease-out); }
+@keyframes lp-sheet-in { from { opacity: 0; transform: translateY(-12px); } }
 .lp-sheet ul { list-style: none; margin: 0 0 24px; padding: 0; }
 .lp-sheet li a { display: flex; align-items: center; min-height: 56px; font-size: 28px; font-weight: 600; letter-spacing: -0.01em; border-bottom: 1px solid #1c1d21; }
 .lp-sheetClose { position: absolute; top: 20px; left: 13px; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--l-ink); cursor: pointer; }
@@ -165,5 +162,4 @@
 .lp-sheetPrimary { background: var(--l-yellow); color: var(--l-bg); }
 .lp-sheetLine { border: 1.5px solid #3a3c42; color: var(--l-ink); }
 .lp-menu:focus-visible, .lp-sheetClose:focus-visible, .lp-sheet a:focus-visible { outline: 2px solid var(--l-yellow); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .lp-sheet, .lp-sheet:not(:popover-open) { transform: none; } }
-@media (min-width: 900px) { .lp-sheet { inset: 0 auto 0 0; width: 380px; height: 100svh; border-bottom: 0; border-right: 1px solid #23252a; } }
+@media (prefers-reduced-motion: reduce) { .lp-sheet { animation: none; } }

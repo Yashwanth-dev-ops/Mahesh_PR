@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { LoginPill, PillCTA } from "@/components/ui/PillLinks";
 import { IntroController } from "./IntroClient";
+import { LandingMenu } from "./LandingMenu";
 import { PhonePreview } from "./PhonePreview";
 import "./landing.css";
 
@@ -23,7 +24,7 @@ const STICKERS = [
 const onRing = (deg: number, axis: "x" | "y") => `${(320 + 319 * (axis === "x" ? Math.cos : Math.sin)((deg * Math.PI) / 180)).toFixed(1)}px`;
 
 // Signed-out visitors are sent to the student login first, then on to the page.
-const NAV = [["Subjects", "/subjects"], ["Papers", "/papers"], ["Notices", "/notices"], ["Privacy", "/privacy"]];
+const NAV: [string, string][] = [["Subjects", "/subjects"], ["Papers", "/papers"], ["Notices", "/notices"], ["Privacy", "/privacy"]];
 
 function Headline() {
   let i = 0;
@@ -55,10 +56,7 @@ export function Landing() {
 
       <header className="lp-nav">
         <div className={`lp-wrap lp-navWrap`}>
-          {/* Native popover: opens and closes without JavaScript; Escape and a tap outside close it. */}
-          <button type="button" className="lp-menu" popoverTarget="lp-sheet" aria-label="Menu">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
-          </button>
+          <LandingMenu nav={NAV} />
           <nav aria-label="Main">
             <ul className="lp-links">
               {NAV.map(([l, h]) => <li key={l}><Link className="lp-mono" href={h}>{l}</Link></li>)}
@@ -68,16 +66,6 @@ export function Landing() {
         </div>
       </header>
 
-      <nav id="lp-sheet" popover="auto" className="lp-sheet" aria-label="Menu">
-        <button type="button" className="lp-sheetClose" popoverTarget="lp-sheet" popoverTargetAction="hide" aria-label="Close menu">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
-        </button>
-        <ul>{NAV.map(([l, h]) => <li key={l}><Link href={h}>{l}</Link></li>)}</ul>
-        <div className="lp-sheetActs">
-          <Link className="lp-sheetPrimary" href="/login">Student login</Link>
-          <Link className="lp-sheetLine" href="/signup">Create an account</Link>
-        </div>
-      </nav>
 
       <main id="main">
         <section className="lp-hero">
