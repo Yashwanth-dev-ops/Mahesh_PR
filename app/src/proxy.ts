@@ -57,5 +57,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|avatars/|.*\\.(?:png|jpg|svg|webp|ico)$).*)"],
+  // Not the landing page ("/", needs `.+`) or /privacy: nothing there depends on the session, so they're served straight
+  // from Vercel's cache without waking a server (the first visitor after a quiet spell waited 3-4 s).
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|avatars/|privacy$|.*\\.(?:png|jpg|svg|webp|ico)$).+)"],
 };
