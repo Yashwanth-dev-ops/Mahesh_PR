@@ -66,7 +66,7 @@ export function PhotoEditor({ file, title = "Adjust your photo", saving = false,
   };
   const down = (e: React.PointerEvent) => {
     if (pointers.current.size >= 2) return; // a third finger joining mid-gesture is ignored, so nothing jumps
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} // keeps the drag if the finger leaves the box; never fatal
     pointers.current.set(e.pointerId, rel(e));
     if (pointers.current.size === 2) startPinch();
     else { // double-tap / double-click: 1× ↔ 2×
