@@ -140,7 +140,6 @@
 .ad-note { margin: 2px 0 0; font-size: 12px; color: var(--ink-muted); }
 .ad-noteBad { margin: 2px 0 0; font-size: 12px; color: var(--danger); }
 .ad-actionCell { font-size: 14px; font-weight: 500; margin: 0; }
-.ad-audit td:first-child { width: 130px; }
 .ad-tableFoot { padding-top: 12px; }
 .ad-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .ad-badge-active { background: #e3f2ea; color: var(--success); }
@@ -187,3 +186,10 @@
 .ad-bar { height: 6px; border-radius: 999px; background: var(--surface); overflow: hidden; }
 .ad-bar span { display: block; height: 100%; background: var(--accent); transition: width 300ms linear; }
 .ad-skips { margin: 0; padding: 12px 14px; list-style: none; border-radius: 10px; background: #fbe7e5; color: var(--danger); font-family: var(--font-mono), monospace; font-size: 12px; line-height: 1.7; max-height: 260px; overflow: auto; }
+
+/* Audit: one heading per day, rows show only the time (full date and seconds on hover). */
+.ad-dayRow th { padding: 18px 0 8px; font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink); border-bottom: 1px solid var(--border); }
+.ad-dayRow th span { font-weight: 400; color: var(--ink-muted); }
+.ad-table tbody:first-of-type .ad-dayRow th { padding-top: 8px; }
+.ad-audit td:first-child { width: 72px; }
+.ad-audit time { cursor: default; }
