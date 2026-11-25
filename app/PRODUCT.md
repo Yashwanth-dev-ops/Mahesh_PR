@@ -38,7 +38,7 @@ Every upload is checked by an admin, and the same file can never be added twice 
 - Open: Python runner in v1, a third faculty role, self-signup vs CSV, which years launch first.
 
 ## Brand Commitments
-- Name is undecided: use `[App Name]` everywhere until the end of the project.
+- Name: **StudyDashBoard** (decided 2026-11-25). Set once in `APP_NAME` (src/lib/site.ts); the logo square shows its first letter.
 - Never use the college's name or logo.
 - No copyrighted textbook PDFs; takedown contact on every page.
 

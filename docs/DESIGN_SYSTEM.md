@@ -13,7 +13,7 @@ Status: DIRECTION DRAFT. The final tokens are set during the Figma step using th
 - **Avoid (AI-slop tells):** purple-blue gradients, glassmorphism, glow effects, emoji as icons, bento grids for everything, centred hero with a gradient headline.
 
 ## 2. Brand
-- Name: [App Name], to be decided at the end. Do not use the college name or logo anywhere in the UI, code, domain or metadata. Use a neutral placeholder wordmark in Figma.
+- Name: StudyDashBoard (decided 2026-11-25). Do not use the college name or logo anywhere in the UI, code, domain or metadata. Use a neutral placeholder wordmark in Figma.
 - Voice: friendly senior student. Short, plain, encouraging. ("Be the first to upload", not "No data found".)
 
 ## 3. Color: black, yellow, white (chosen by the user, matches the Figma `Color` collection)

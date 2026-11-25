@@ -1,5 +1,5 @@
 // Product name is a placeholder until it is chosen at the end of the project (see docs/AGENTS.md).
-export const APP_NAME = "[App Name]";
+export const APP_NAME = "StudyDashBoard";
 export const APP_DESCRIPTION =
   "Chapter notes, past question papers and college notices for AI-ML students, checked by admins.";
 

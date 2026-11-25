@@ -12,7 +12,7 @@ import nodemailer from "nodemailer";
 
 const { SMTP_USER: user, SMTP_PASS: pass } = process.env;
 const host = process.env.SMTP_HOST || "smtp.gmail.com", port = Number(process.env.SMTP_PORT || 465);
-const APP = "[App Name]";
+const APP = "StudyDashBoard";
 const tokenFile = `${homedir()}/.supabase/access-token`;
 const token = process.env.SUPABASE_ACCESS_TOKEN || (existsSync(tokenFile) && readFileSync(tokenFile, "utf8").trim());
 const ref = existsSync("supabase/.temp/project-ref") && readFileSync("supabase/.temp/project-ref", "utf8").trim();

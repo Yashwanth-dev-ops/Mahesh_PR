@@ -1,9 +1,9 @@
-# PRD — [App Name]
+# PRD — StudyDashBoard
 
 Status: DRAFT, awaiting approval · Owner: (your brother) · Last updated: 2026-11-20
 
 ## 1. Product overview
-- **Name:** [App Name] — to be decided at the end of the project
+- **Name:** StudyDashBoard (decided 2026-11-25)
 - **One line:** A web library where AI-ML students learn subject by subject, share study material, and find previous question papers and college notices in one place.
 - **Type:** Web app (responsive, mobile-first; most students will use phones)
 - **Platform:** Web. No native app in v1.

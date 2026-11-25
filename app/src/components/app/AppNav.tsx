@@ -21,7 +21,7 @@ const isOn = (path: string, href: string) =>
 export function AppTop() {
   return (
     <header className="ap-top">
-      <Link href="/home" className="ap-brand"><span className="ap-mark" aria-hidden="true">A</span><span>{APP_NAME}</span></Link>
+      <Link href="/home" className="ap-brand"><span className="ap-mark" aria-hidden="true">{APP_NAME[0]}</span><span>{APP_NAME}</span></Link>
       <span className="ap-topIcons">
         <Link href="/search" className="ap-iconLink" aria-label="Search"><Svg d={Icon.search} /></Link>
         <Link href="/notices" className="ap-iconLink" aria-label="Notices"><Svg d={Icon.bell} /></Link>
@@ -35,7 +35,7 @@ export function AppNav() {
   const path = usePathname();
   return (
     <nav className="ap-nav" aria-label="App">
-      <Link href="/home" className="ap-brand ap-brandSide"><span className="ap-mark" aria-hidden="true">A</span><span>{APP_NAME}</span></Link>
+      <Link href="/home" className="ap-brand ap-brandSide"><span className="ap-mark" aria-hidden="true">{APP_NAME[0]}</span><span>{APP_NAME}</span></Link>
       <ul>
         {LINKS.map((l) => (
           <li key={l.href}>

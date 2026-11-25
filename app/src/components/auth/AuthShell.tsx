@@ -15,7 +15,7 @@ export function AuthShell({ id, kicker, title, lead, children }: { id: string; k
       <div className="au-side">
         <header className="au-top">
           <Link href="/" className="au-home">
-            <span className="au-mark" aria-hidden="true">A</span>
+            <span className="au-mark" aria-hidden="true">{APP_NAME[0]}</span>
             {APP_NAME}
           </Link>
           <Link href="/privacy" className="au-privacy">Privacy</Link>

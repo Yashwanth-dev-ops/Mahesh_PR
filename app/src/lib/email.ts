@@ -27,7 +27,7 @@ export function emailFrame(title: string, body: string, button: { label: string;
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f3ef;padding:32px 16px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border:1px solid #dedad2;border-radius:16px">
 <tr><td style="background:#08090b;border-radius:16px 16px 0 0;padding:20px 24px;color:#f5f3ef;font-weight:bold;font-size:16px">
-<span style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#ffc900;color:#08090b;border-radius:6px;margin-right:10px">A</span>${esc(APP_NAME)}</td></tr>
+<span style="display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:#ffc900;color:#08090b;border-radius:6px;margin-right:10px">${APP_NAME[0]}</span>${esc(APP_NAME)}</td></tr>
 <tr><td style="padding:28px 24px 8px"><h1 style="margin:0 0 12px;font-size:24px;line-height:1.2">${esc(title)}</h1>
 <p style="margin:0 0 24px;font-size:16px;line-height:1.55;color:#5a5750">${body}</p>
 <a href="${esc(button.url)}" style="display:inline-block;background:#ffc900;color:#08090b;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 24px;border-radius:999px">${esc(button.label)}</a></td></tr>

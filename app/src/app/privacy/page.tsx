@@ -20,7 +20,7 @@ export default function PrivacyPage() {
   return (
     <div className="pv-page">
       <header className="pv-top">
-        <Link href="/" className="pv-home"><span className="pv-mark" aria-hidden="true">A</span>{APP_NAME}</Link>
+        <Link href="/" className="pv-home"><span className="pv-mark" aria-hidden="true">{APP_NAME[0]}</span>{APP_NAME}</Link>
       </header>
       <main className="pv-main">
         <article className="pv-doc">

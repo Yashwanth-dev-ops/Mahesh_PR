@@ -66,7 +66,7 @@ async function main() {
   const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
   const day = new Date().toISOString().slice(0, 10);
   const work = mkdtempSync(join(tmpdir(), "library-backup-"));
-  const manifest = { app: "[App Name] library", createdAt: new Date().toISOString(), source: process.env.NEXT_PUBLIC_SUPABASE_URL, buckets: [], files: [], db: [], filesOnly: FILES_ONLY };
+  const manifest = { app: "StudyDashBoard library", createdAt: new Date().toISOString(), source: process.env.NEXT_PUBLIC_SUPABASE_URL, buckets: [], files: [], db: [], filesOnly: FILES_ONLY };
 
   try {
     const { data: buckets, error } = await db.storage.listBuckets();

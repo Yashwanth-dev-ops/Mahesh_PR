@@ -1,4 +1,4 @@
-# [App Name]
+# StudyDashBoard
 
 Web library for the AI-ML branch: subjects → chapters → study material, previous and regular exam papers, notices and campaigns, learning tools, and a student/admin split.
 
