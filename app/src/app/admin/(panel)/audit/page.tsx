@@ -54,6 +54,7 @@ async function Audit({ searchParams }: { searchParams: Promise<Search> }) {
                   {rows.map((r) => (
                     <tr key={r.id}>
                       <td className="ad-num"><time dateTime={r.at} title={full(r.at)}>{time(r.at)}</time></td>
+                      <td className="ad-brk" aria-hidden="true" />
                       <td>{r.admin === "—" ? <span className="ad-note">Not signed in</span> : r.admin}</td>
                       <td className={BAD.test(r.action) ? "ad-noteBad ad-actionCell" : "ad-actionCell"}>{r.action}</td>
                       <td>{r.target ?? "—"}</td><td className="ad-note">{r.details ?? ""}</td>

@@ -154,7 +154,7 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
       <section className="ad-card ad-tableCard" aria-label="Students">
         {shown.length === 0 ? <p className="ad-empty">{rows.length ? "No students match. Clear the search or filters." : "No students yet. Import the class list or use Bulk register."}</p> : (
           <div className="ad-tableWrap">
-            <table className="ad-table">
+            <table className="ad-table ad-students">
               <thead>
                 <tr>
                   <th scope="col" aria-sort={sort.key === "name" ? (sort.dir === 1 ? "ascending" : "descending") : "none"}>{sortBtn("name", "Name")}</th>
@@ -167,6 +167,7 @@ export function StudentTable({ rows }: { rows: StudentRow[] }) {
                 {shown.map((r) => (
                   <tr key={r.id} aria-busy={busy === r.id || undefined}>
                     <td><p className="ad-strong">{r.name}</p><p className={r.status === "suspended" ? "ad-noteBad" : "ad-note"}>{r.note}</p></td>
+                    <td className="ad-brk" aria-hidden="true" />
                     <td className="ad-num">{r.roll}</td>
                     <td className="ad-num">{r.year ? `${Y[r.year]} ${r.section ?? ""}` : "—"}</td>
                     <td className="ad-num">{phoneText(r.phone)}</td>
