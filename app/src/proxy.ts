@@ -23,7 +23,7 @@ export async function proxy(request: NextRequest) {
     || (path.startsWith("/admin") && !path.startsWith("/admin/login"));
   if (!data.user && isPrivate) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = path.startsWith("/admin") ? "/admin/login" : "/login"; // each kind of account has its own door
     url.search = `?next=${encodeURIComponent(path)}`;
     return NextResponse.redirect(url);
   }
@@ -38,7 +38,7 @@ export async function proxy(request: NextRequest) {
   };
   const gated = path === "/login" || path === "/signup" || path.startsWith("/signup/complete")
     || ["/home", "/subjects", "/read", "/notes", "/search", "/papers", "/profile", "/notices", "/consent"].some((p) => path.startsWith(p))
-    || (path.startsWith("/admin") && !path.startsWith("/admin/login"));
+    || path.startsWith("/admin");
   if (!gated) return response;
 
   const { data: p } = await supabase.from("profiles").select("status, role, privacy_version").eq("id", data.user.id).maybeSingle();
@@ -52,8 +52,11 @@ export async function proxy(request: NextRequest) {
   // An invited admin agrees on /admin/setup itself, while choosing a password.
   if (!agreed && !path.startsWith("/consent") && path !== "/admin/setup") return go("/consent");
   if (agreed && path.startsWith("/consent")) return go(p.role === "admin" ? "/admin" : "/home");
+  // Admins and students never share pages: the admin area is admins only, the student app is students only.
+  const studentApp = ["/home", "/subjects", "/read", "/notes", "/search", "/papers", "/profile", "/notices"].some((x) => path.startsWith(x));
+  if (p.role === "admin" && (studentApp || path === "/admin/login")) return go("/admin");
   if (path.startsWith("/admin") && p.role !== "admin") return go("/home");
-  if (path === "/login" || path === "/signup" || path.startsWith("/signup/complete")) return go("/home");
+  if (path === "/login" || path === "/signup" || path.startsWith("/signup/complete")) return go(p.role === "admin" ? "/admin" : "/home");
   return response;
 }
 

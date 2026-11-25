@@ -12,7 +12,7 @@ export default function LoginPage() {
     <AuthShell id="login-title" title="Student login" lead="Sign in with your roll number and password.">
       <LoginForm />
       <GoogleButton />
-      <p className="au-alt">New here? <Link href="/signup">Create an account</Link> · <Link href="/admin/login">Admin login</Link></p>
+      <p className="au-alt">New here? <Link href="/signup">Create an account</Link></p>
     </AuthShell>
   );
 }

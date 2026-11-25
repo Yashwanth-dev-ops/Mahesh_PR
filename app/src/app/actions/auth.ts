@@ -218,6 +218,8 @@ export async function updatePassword(form: FormData): Promise<FormResult> {
   const supabase = await supabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { message: "This reset link has expired. Ask for a new one." };
+  const { data: me } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  if (me?.role === "admin" && password.length < 12) return { errors: { password: "Admin passwords need at least 12 characters." } };
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { message: /same/i.test(error.message) ? "Choose a password you haven't used here before." : "We couldn't change your password. Try again." };
   return { ok: true };

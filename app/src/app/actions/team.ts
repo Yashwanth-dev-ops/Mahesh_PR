@@ -82,7 +82,7 @@ export async function completeAdminSetup(form: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/admin/login");
   const password = String(form.get("password") ?? "");
-  if (password.length < 8 || password.length > 72) redirect("/admin/setup?e=password");
+  if (password.length < 12 || password.length > 72) redirect("/admin/setup?e=password"); // admins: 12+ characters
   if (form.get("consent") !== "yes") redirect("/admin/setup?e=consent");
   const db = supabaseAdmin();
   const { data: p } = await db.from("profiles").select("full_name, role").eq("id", user.id).maybeSingle();

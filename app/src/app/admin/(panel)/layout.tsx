@@ -1,8 +1,12 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { signOut } from "@/app/actions/auth";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { APP_NAME } from "@/lib/site";
 import "@/components/admin/admin.css";
+
+// Admin pages are never listed by search engines.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 // Shared shell for every admin page (Figma A9 / B1-B5): black sidebar, warm-white main. The proxy limits /admin to admins.
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
