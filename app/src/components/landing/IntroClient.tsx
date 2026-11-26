@@ -18,7 +18,10 @@ export function IntroController() {
     const ro = new ResizeObserver(fit);
     ro.observe(visual);
 
-    if (root.dataset.intro !== "pending") return () => ro.disconnect();
+    // Back/forward cache (Safari): a page left mid-intro comes back with its animations frozen; show the end state.
+    const shown = (e: PageTransitionEvent) => { if (e.persisted && root.dataset.intro) root.dataset.intro = "done"; };
+    addEventListener("pageshow", shown);
+    if (root.dataset.intro !== "pending") return () => { ro.disconnect(); removeEventListener("pageshow", shown); };
 
     let cancelled = false;
     let done: ReturnType<typeof setTimeout> | undefined;
@@ -39,7 +42,11 @@ export function IntroController() {
     const t = setTimeout(start, 800);
     document.fonts?.ready.then(() => { clearTimeout(t); start(); });
 
-    return () => { cancelled = true; clearTimeout(t); clearTimeout(done); ro.disconnect(); };
+    return () => {
+      cancelled = true; clearTimeout(t); clearTimeout(done); ro.disconnect(); removeEventListener("pageshow", shown);
+      // Left mid-intro (e.g. a menu link): never come back to a half-played intro with hidden letters.
+      if (root.dataset.intro === "play" || root.dataset.intro === "pending") root.dataset.intro = "done";
+    };
   }, []);
 
   return null;
