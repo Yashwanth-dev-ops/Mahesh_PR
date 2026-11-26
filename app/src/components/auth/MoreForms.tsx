@@ -59,11 +59,12 @@ export function ForgotForm({ admin = false }: { admin?: boolean } = {}) {
   );
 }
 
-export function ResetForm() {
+export function ResetForm({ th }: { th?: string } = {}) {
   const router = useRouter();
   const f = useAction(updatePassword, () => router.push("/home"));
   return (
     <form id={AUTH_FORM_ID} className="au-form" noValidate onSubmit={f.onSubmit}>
+      {th && <input type="hidden" name="th" value={th} />}
       <PasswordField name="password" label="New password" autoComplete="new-password" hint="At least 8 characters" error={f.errors.password} onEdit={f.clear("password")} />
       <PasswordField name="confirm" label="Type it again" autoComplete="new-password" error={f.errors.confirm} onEdit={f.clear("confirm")} />
       <div className="au-actions"><PillButton>{f.busy ? "Saving…" : "Save new password"}</PillButton></div>

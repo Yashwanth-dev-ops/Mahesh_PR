@@ -19,6 +19,8 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
+  // A set-password link (see /auth/confirm): no session yet; the page checks the one-time code on Save.
+  if ((path === "/reset-password" || path === "/admin/setup") && request.nextUrl.searchParams.has("th")) return response;
   const isPrivate = ["/home", "/subjects", "/read", "/notes", "/search", "/papers", "/profile", "/notices", "/reset-password", "/signup/complete", "/consent"].some((p) => path.startsWith(p))
     || (path.startsWith("/admin") && !path.startsWith("/admin/login"));
   if (!data.user && isPrivate) {

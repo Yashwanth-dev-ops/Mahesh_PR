@@ -12,6 +12,10 @@ export async function GET(request: NextRequest) {
   const next = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/home"; // only same-site paths
   const go = (path: string) => NextResponse.redirect(new URL(path, request.url));
 
+  // Mail apps open links to scan them, which would spend a one-time code before the person taps it. Set-password
+  // links therefore only carry the code to the page; it's checked when they press Save (a scanner never does).
+  if (token_hash && type === "recovery" && (next === "/reset-password" || next === "/admin/setup")) return go(`${next}?th=${encodeURIComponent(token_hash)}`);
+
   const supabase = await supabaseServer();
   const { error } = token_hash && type
     ? await supabase.auth.verifyOtp({ token_hash, type })

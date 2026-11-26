@@ -79,16 +79,19 @@ export async function removeAdmin(profileId: string) {
 /** The invited person, signed in by the emailed link, sets a password and agrees to the privacy notice. */
 export async function completeAdminSetup(form: FormData) {
   const supabase = await supabaseServer();
+  const th = String(form.get("th") ?? "");
+  const back = (e: string) => redirect(`/admin/setup?e=${e}${th ? `&th=${encodeURIComponent(th)}` : ""}`);
+  if (th) { const { error } = await supabase.auth.verifyOtp({ type: "recovery", token_hash: th }); if (error) redirect("/admin/setup?e=expired"); }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/admin/login");
   const password = String(form.get("password") ?? "");
-  if (password.length < 12 || password.length > 72) redirect("/admin/setup?e=password"); // admins: 12+ characters
-  if (form.get("consent") !== "yes") redirect("/admin/setup?e=consent");
+  if (password.length < 12 || password.length > 72) back("password"); // admins: 12+ characters
+  if (form.get("consent") !== "yes") back("consent");
   const db = supabaseAdmin();
   const { data: p } = await db.from("profiles").select("full_name, role").eq("id", user.id).maybeSingle();
   if (p?.role !== "admin") redirect("/login");
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) redirect("/admin/setup?e=password");
+  if (error) back("password");
   await db.from("profiles").update({ privacy_version: PRIVACY_VERSION, privacy_accepted_at: new Date().toISOString() }).eq("id", user.id);
   await db.from("admin_invites").update({ accepted_at: new Date().toISOString() }).eq("user_id", user.id).is("accepted_at", null);
   await audit(db, { id: user.id, label: p.full_name }, "Accepted the admin invite", user.email ?? null);

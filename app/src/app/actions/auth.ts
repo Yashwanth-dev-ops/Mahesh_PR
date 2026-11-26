@@ -197,6 +197,11 @@ export async function updatePassword(form: FormData): Promise<FormResult> {
   };
   if (hasErrors(errors)) return { errors };
   const supabase = await supabaseServer();
+  const th = String(form.get("th") ?? "");
+  if (th) { // the one-time code from the email, spent only now (see /auth/confirm)
+    const { error } = await supabase.auth.verifyOtp({ type: "recovery", token_hash: th });
+    if (error) return { message: "This link has expired or was already used. Ask for a new one from Forgot password." };
+  }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { message: "This reset link has expired. Ask for a new one." };
   const { data: me } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
